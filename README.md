@@ -20,7 +20,7 @@ flowchart TB
         MR["your-agent<br/>your business logic + a manifest"]
     end
     TPL -- "COPY — once, at creation" --> MR
-    MR -- "REFERENCE — live, by version (@v4)" --> POL
+    MR -- "REFERENCE — live, by version (@v0.0.4)" --> POL
 ```
 
 The platform team owns the first two (**the rails**); you own the third (**the cargo**).
@@ -37,13 +37,13 @@ flowchart TB
     end
     subgraph REF["🔗 REFERENCE — live, by version"]
         direction LR
-        Y2["your repo<br/>uses policies@v4"] -- "follows" --> P["policies@v4"]
-        P -- "platform ships @v5;<br/>you adopt with a one-line bump" --> Y2
+        Y2["your repo<br/>uses policies@v0.0.4"] -- "follows" --> P["policies@v0.0.4"]
+        P -- "platform ships @v0.0.5;<br/>you adopt with a one-line bump" --> Y2
     end
 ```
 
 - **COPY** = a one-time photocopy. When you start, the **template** is photocopied into your repo. After that your copy is *yours* — if the template changes later, your copy does **not** change on its own.
-- **REFERENCE** = a live link by version number. Your repo *points at* **policies** with a label like `@v4`. The platform can ship `@v5`; you pick it up by changing that one label.
+- **REFERENCE** = a live link by version number. Your repo *points at* **policies** with a label like `@v0.0.4`. The platform can ship `@v0.0.5`; you pick it up by changing that one label.
 
 **Everyday version:** COPY is like photocopying a recipe card — your copy won't update when the original does. REFERENCE is like following a magazine by issue number — you choose which issue you read, and moving to the next issue is one small step.
 
@@ -91,14 +91,14 @@ Because your repo **references** `policies` by version, rolling out an improveme
 
 ```mermaid
 flowchart LR
-    DEV["Platform improves a<br/>check or the reviewer"] --> PUB["Publishes policies@v5<br/>(v1…v4 stay frozen)"]
-    PUB --> ADOPT["Each member adopts with a<br/>one-line bump: @v4 → @v5"]
+    DEV["Platform improves a<br/>check or the reviewer"] --> PUB["Publishes policies@v0.0.5<br/>(v0.0.1…v0.0.4 stay frozen)"]
+    PUB --> ADOPT["Each member adopts with a<br/>one-line bump: @v0.0.4 → @v0.0.5"]
     ADOPT --> MA["member A ✓"]
     ADOPT --> MB["member B ✓"]
     ADOPT --> MC["member C ✓"]
 ```
 
-Old versions (`v1…v4`) stay frozen forever, so nothing breaks under you. You upgrade when you're ready by bumping one line. Template changes (the **COPY** side) are handled in the same spirit, automatically: the [agent-registry](https://github.com/turingplanet/agent-registry) **migration bot** runs `copier update` across the fleet and opens a PR per repo — never auto-merging, so each change still passes through your gate.
+Old versions (`v0.0.1…v0.0.4`) stay frozen forever, so nothing breaks under you. You upgrade when you're ready by bumping one line. Template changes (the **COPY** side) are handled in the same spirit, automatically: the [agent-registry](https://github.com/turingplanet/agent-registry) **migration bot** runs `copier update` across the fleet and opens a PR per repo — never auto-merging, so each change still passes through your gate.
 
 ## Plain-language glossary
 
@@ -115,7 +115,7 @@ Old versions (`v1…v4`) stay frozen forever, so nothing breaks under you. You u
 | **member repo** | your own repo, with your code |
 | **PR** (pull request) | a request to merge a change; checks run before it can merge |
 | **the gate** | the automatic pass/fail (the tests are the judge; the AI just advises) |
-| **`@v4`** | which frozen version of the shared rules your repo follows |
+| **`@v0.0.4`** | which frozen version of the shared rules your repo follows |
 
 ## Where to go next
 
