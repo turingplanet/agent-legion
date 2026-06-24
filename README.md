@@ -1,67 +1,132 @@
 # 图灵星球 Agent 军团 — Agent Legion
 
-A platform for building and running many AI agents, served over **MCP**. You write your agent's business logic in **your own repo**; the platform provides the shared machinery — a scaffold to start from, an automated reviewer that gates every change, and a gateway that serves your agent in production. **This repo is the front door** — start here, then jump to the repo you need.
+A platform for building and running lots of small AI agents (served over **MCP**). The whole idea in one sentence:
 
-**The one idea that makes it work:** your repo describes itself in a small **`agent.manifest.yaml`** (its language, folders, and commands). Because every platform tool reads that manifest, the platform adapts to your repo as *data* — onboarding a new kind of agent rarely means changing the platform itself.
+> **You write your agent's code in your own repo. The platform gives you the shared machinery — a starter kit, an automatic reviewer, and a place to run.**
 
-## The three repos, and how change flows between them
+If a word here ever feels like jargon, jump to the **[plain-language glossary](#plain-language-glossary)** at the bottom.
+
+## 1. The big picture: three repos
+
+There are only **three** repositories, and each has one job:
+
+```mermaid
+flowchart TB
+    subgraph Platform["🏗️ Platform owns the rails — github.com/turingplanet"]
+        TPL["agent-template<br/>the starter kit you copy once"]
+        POL["policies<br/>the rulebook + the robot reviewer"]
+    end
+    subgraph You["👤 You own the cargo — your own account"]
+        MR["your-agent<br/>your business logic + a manifest"]
+    end
+    TPL -- "COPY — once, at creation" --> MR
+    MR -- "REFERENCE — live, by version (@v4)" --> POL
+```
+
+The platform team owns the first two (**the rails**); you own the third (**the cargo**).
+
+## 2. The two ways things connect: COPY vs REFERENCE
+
+This is the one idea that makes everything else click. Repos connect to the shared ones in **two different ways**:
+
+```mermaid
+flowchart TB
+    subgraph COPY["📋 COPY — happens once, then frozen"]
+        direction LR
+        T["agent-template"] -- "copied in at creation,<br/>then detaches" --> Y["your repo"]
+    end
+    subgraph REF["🔗 REFERENCE — live, by version"]
+        direction LR
+        Y2["your repo<br/>uses policies@v4"] -- "follows" --> P["policies@v4"]
+        P -- "platform ships @v5;<br/>you adopt with a one-line bump" --> Y2
+    end
+```
+
+- **COPY** = a one-time photocopy. When you start, the **template** is photocopied into your repo. After that your copy is *yours* — if the template changes later, your copy does **not** change on its own.
+- **REFERENCE** = a live link by version number. Your repo *points at* **policies** with a label like `@v4`. The platform can ship `@v5`; you pick it up by changing that one label.
+
+**Everyday version:** COPY is like photocopying a recipe card — your copy won't update when the original does. REFERENCE is like following a magazine by issue number — you choose which issue you read, and moving to the next issue is one small step.
+
+## 3. How you build an agent (start here)
+
+You do **not** fork anything. Each agent is its **own repo that you own**:
+
+```mermaid
+flowchart TB
+    A["You want to build an agent"] --> B["Click 'Use this template' on agent-template<br/>(this is NOT a Fork)"]
+    B --> C["You get a brand-new repo YOU own:<br/>a detached copy, no link back to the template"]
+    C --> D["Write code in /api + /mcp,<br/>fill in agent.manifest.yaml"]
+    D --> E["Open a Pull Request INSIDE your repo<br/>(your branch → your main)"]
+    E --> F["The review flow runs<br/>(pulled live from policies@vN)"]
+    F --> G{"🚦 Gate: did the hard checks pass?"}
+    G -- "yes ✅" --> H["It merges into your main"]
+    G -- "no ❌" --> D
+```
+
+**The two things people get confused about:**
+
+- **"Use this template" vs "Fork".** On `agent-template`, click GitHub's **"Use this template"** button. That makes a brand-new repo you own, with the files but **no link back** to the template. A **Fork** is different — it stays *connected* to the original (it's for sending changes *back* to it), which you don't want here. So: **template = "Use this template", never fork.**
+- **"Open a PR" = a PR inside *your own* repo.** Once you have your repo, you don't save changes straight to your `main`. You make a branch, then **open a pull request** (your branch → your `main`). Opening that PR is what starts the automatic review. It is *not* sending anything to the platform — it all happens in your repo. (Same "review before you merge" habit you'd use with a human reviewer.)
+
+## 4. What happens when you open a PR
+
+Opening a PR runs the **review flow** — the steps come from `policies`, live:
+
+```mermaid
+flowchart TB
+    PR["You open a Pull Request"] --> M["1. Read the manifest<br/>(your repo's instruction card)"]
+    M --> S["2. Set up declared tools<br/>(e.g. Python + poetry)"]
+    S --> CH["3. Run the HARD checks:<br/>install · tests · lint · security"]
+    AI["🤖 AI reviewer<br/>reads your diff, writes advice"] -. "comments only — never blocks" .-> G
+    CH --> G{"🚦 4. Gate:<br/>did the hard checks pass?"}
+    G -- "yes ✅" --> OK["PR can merge"]
+    G -- "no ❌" --> BACK["Sent back with the findings"]
+```
+
+The important part: **the gate decides, the AI only advises.** The automated checks (install, tests, lint, security) are the real pass/fail. The 🤖 AI reviewer reads your change and leaves comments, but it can *never* block your PR on its own. Green checks = you can merge.
+
+## 5. How platform improvements reach you
+
+Because your repo **references** `policies` by version, rolling out an improvement is simple:
 
 ```mermaid
 flowchart LR
-    TPL["agent-template · Platform"] -- "COPY · once at creation · codemod to update" --> MR["member repos · Contributor (e.g. hello-agent)"]
-    MR -- "REFERENCE · @vN · instant · version bump" --> POL["policies · Platform"]
+    DEV["Platform improves a<br/>check or the reviewer"] --> PUB["Publishes policies@v5<br/>(v1…v4 stay frozen)"]
+    PUB --> ADOPT["Each member adopts with a<br/>one-line bump: @v4 → @v5"]
+    ADOPT --> MA["member A ✓"]
+    ADOPT --> MB["member B ✓"]
+    ADOPT --> MC["member C ✓"]
 ```
 
-| Repo | Role | Owner | How change reaches it |
-| --- | --- | --- | --- |
-| **[policies](https://github.com/turingplanet/policies)** | The logic: the one review flow + the one standing review agent | Platform (`turingplanet`) | members **REFERENCE** it as `@vN` — a bump reaches the whole fleet instantly |
-| **[agent-template](https://github.com/turingplanet/agent-template)** | The scaffold: manifest schema + thin workflow pointer | Platform (`turingplanet`) | **COPIED** once into a new member at creation, then detaches |
-| **[hello-agent](https://github.com/enochhz/hello-agent)** *(private example)* | Example member repo: business logic (`/api` + `/mcp`) + filled manifest | Contributor (`enochhz`) | references `policies@vN`; the first proof of the loop |
+Old versions (`v1…v4`) stay frozen forever, so nothing breaks under you. You upgrade when you're ready by bumping one line. (A change to the **template** is different — it would need a manual migration in each repo. That's the COPY side, and it's deliberately slower.)
 
-- **COPY** (template → your repo): happens once, when you create your repo; the copy is detached, so later template changes don't touch you (a platform-run codemod does that).
-- **REFERENCE** (your repo → policies, `@vN`): your workflow points at the central flow by version; the platform bumps the version and the change reaches everyone at once.
+## Plain-language glossary
 
-## Onboarding: getting your own agent repo
-
-You **don't fork** anything. Each agent lives in its **own independent repo that you own**.
-
-**Greenfield — start fresh (the default):**
-1. On **[agent-template](https://github.com/turingplanet/agent-template)**, click **"Use this template" → Create a new repository**. You get a brand-new repo you own, with the scaffold files and **no link back** to the template — a detached copy (the design's "COPY once, then detach"). This is **not a fork**.
-2. In **your** repo, write your logic in `/api` + `/mcp` and fill in `agent.manifest.yaml`.
-3. Make a branch and **open a pull request inside your own repo** (your branch → your `main`). That PR triggers the automated review — your repo *references* the central flow from `policies@vN`, the standing agent posts findings, and the **deterministic gate** decides whether the PR may merge. You're on the rails.
-
-> **Why a PR, and why not a fork?**
-> - The **PR is inside your own repo**, not a submission to the platform. It's just the unit the reviewer checks — the ordinary "don't push straight to `main`; go through a reviewed PR" discipline, except the reviewer is the standing AI plus the deterministic gate.
-> - You never **fork**. You take a one-time **copy** of the template (Use this template), and you **reference** `policies` live by version (`@v1`) from your workflow file. A fork stays *linked* to its upstream for contributing changes *back* — which isn't what you're doing here.
-
-**Brownfield — adopt an existing repo:** hand-write an `agent.manifest.yaml` describing your repo as it is today, add the thin pointer to `policies@vN`, run the agent in warn-only mode, then migrate to the contract. Same agent, same flow, no forking.
-
-## The seam: the manifest
-
-Every member repo carries an **`agent.manifest.yaml`** at its root — the one fixed **anchor**. It declares toolchain, paths, and commands. Both the review agent and the deterministic CI steps read from it, so structure and tooling change as *data* without ever touching the agent.
-
-## What never changes — the 4 constants
-
-1. **One standing review agent** — platform-owned, reads the manifest, never forked.
-2. **One review flow** — read manifest → install/declared tests → checks → gate decides.
-3. **The gate decides; the LLM advises** — a green build is the judge, never the model's confidence.
-4. **One fixed anchor** — the manifest's name/location; the only hardcoded thing anywhere.
+| You'll see… | It means… |
+| --- | --- |
+| **the platform / the rails** | the shared system everyone builds on (run by `turingplanet`) |
+| **contributor / member** | you, building one agent on the system |
+| **manifest** (`agent.manifest.yaml`) | an index card on your repo telling the system how to build & test it |
+| **the anchor** | the fixed name + location of that card, so every tool can find it |
+| **COPY** | photocopy the starter kit once; your copy then goes its own way |
+| **REFERENCE** | link to the shared rules by version; bump the version to get updates |
+| **`agent-template`** | the starter kit you photocopy ("Use this template") |
+| **`policies`** | the shared rulebook + robot reviewer your repo links to |
+| **member repo** | your own repo, with your code |
+| **PR** (pull request) | a request to merge a change; checks run before it can merge |
+| **the gate** | the automatic pass/fail (the tests are the judge; the AI just advises) |
+| **`@v4`** | which frozen version of the shared rules your repo follows |
 
 ## Where to go next
 
-- **Want the rails / review logic?** → **[policies](https://github.com/turingplanet/policies)**
-- **Want the scaffold to start from?** → **[agent-template](https://github.com/turingplanet/agent-template)**
-- **Want a worked example?** → **[hello-agent](https://github.com/enochhz/hello-agent)**
+- **Want the rules / the reviewer?** → [policies](https://github.com/turingplanet/policies)
+- **Want the starter kit?** → [agent-template](https://github.com/turingplanet/agent-template)
+- **Want a worked example?** → [hello-agent](https://github.com/enochhz/hello-agent)
 
 ## Status
 
-**Architecture 1** (develop → review → deterministic gate) is proven end-to-end: a member PR runs the full flow — manifest → setup toolchain → install → tests → contract → lint → security → AI advisory → **gate decides** — and goes green with every declared check actually executing. **Architecture 2** (build / release) and **Architecture 3** (the MetaMCP gateway runtime) are next.
-
-## Quick recap (a mnemonic, once the terms click)
-
-**3 artifacts** (template · policies · member repos) · **2 propagation paths** (COPY · REFERENCE) · **4 levers** (repo-data · central-logic · agent-behavior · the-anchor) · **4 constants** (one agent · one flow · gate decides · one anchor) · **2 onboarding paths** (greenfield · brownfield) · **1 promotion path** (staging → canary → production).
+Architecture 1 (build → review → gate) works end-to-end today: a PR runs the full flow and the gate decides. Architecture 2 (release / deploy) and Architecture 3 (the MCP gateway) are next.
 
 ## Full design
 
 The complete architecture design lives in Notion: _<add your Notion share link here>_.
-(Prefer it in-repo? It can be committed as `docs/architecture-design.md`.)
