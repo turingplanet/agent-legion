@@ -20,7 +20,7 @@ flowchart TB
         MR["your-agent<br/>your business logic + a manifest"]
     end
     TPL -- "COPY — once, at creation" --> MR
-    MR -- "REFERENCE — live, by version (@v0.0.4)" --> POL
+    MR -- "REFERENCE — live, by version (@vN)" --> POL
 ```
 
 The platform team owns the first two (**the rails**); you own the third (**the cargo**).
@@ -37,13 +37,13 @@ flowchart TB
     end
     subgraph REF["🔗 REFERENCE — live, by version"]
         direction LR
-        Y2["your repo<br/>uses policies@v0.0.4"] -- "follows" --> P["policies@v0.0.4"]
-        P -- "platform ships @v0.0.5;<br/>you adopt with a one-line bump" --> Y2
+        Y2["your repo<br/>uses policies@vN"] -- "follows" --> P["policies@vN"]
+        P -- "platform ships a newer version;<br/>you adopt by bumping it" --> Y2
     end
 ```
 
 - **COPY** = a one-time photocopy. When you start, the **template** is photocopied into your repo. After that your copy is *yours* — if the template changes later, your copy does **not** change on its own.
-- **REFERENCE** = a live link by version number. Your repo *points at* **policies** with a label like `@v0.0.4`. The platform can ship `@v0.0.5`; you pick it up by changing that one label.
+- **REFERENCE** = a live link by version number. Your repo *points at* **policies** with a label like `@vN`. The platform can ship a newer version; you pick it up by bumping that version.
 
 **Everyday version:** COPY is like photocopying a recipe card — your copy won't update when the original does. REFERENCE is like following a magazine by issue number — you choose which issue you read, and moving to the next issue is one small step.
 
@@ -85,20 +85,22 @@ flowchart TB
 
 The important part: **the gate decides, the AI only advises.** The automated checks (install, tests, lint, security) are the real pass/fail. The 🤖 AI reviewer reads your change and leaves comments, but it can *never* block your PR on its own. Green checks = you can merge.
 
-## 5. How platform improvements reach you
+## 5. How updates reach you
 
-Because your repo **references** `policies` by version, rolling out an improvement is simple:
+You're **pinned** to specific versions and **never force-updated** — old tags stay frozen, so nothing changes under you. You adopt when ready. And you don't have to watch for releases: updates arrive as a **PR on your repo** — that PR *is* the notification. You review it, your own gate runs on it, and you merge.
 
 ```mermaid
 flowchart LR
-    DEV["Platform improves a<br/>check or the reviewer"] --> PUB["Publishes policies@v0.0.5<br/>(v0.0.1…v0.0.4 stay frozen)"]
-    PUB --> ADOPT["Each member adopts with a<br/>one-line bump: @v0.0.4 → @v0.0.5"]
-    ADOPT --> MA["member A ✓"]
-    ADOPT --> MB["member B ✓"]
-    ADOPT --> MC["member C ✓"]
+    DEV["Platform ships a new<br/>policies and/or template version"] --> BOT["migration bot<br/>(agent-registry)"]
+    BOT --> PR["opens a PR on each member<br/>— never auto-merges"]
+    PR --> GATE["your gate runs;<br/>you review + merge"]
 ```
 
-Old versions (`v0.0.1…v0.0.4`) stay frozen forever, so nothing breaks under you. You upgrade when you're ready by bumping one line. Template changes (the **COPY** side) are handled in the same spirit, automatically: the [agent-registry](https://github.com/turingplanet/agent-registry) **migration bot** runs `copier update` across the fleet and opens a PR per repo — never auto-merging, so each change still passes through your gate.
+**If `policies` changes** (the review flow / reviewer — the **REFERENCE** side): your `review.yml` pins `policies@vN`, so a new version doesn't touch you until you bump it. Adopt by changing the version in `review.yml` (the `uses:@vN` line and its matching `policies_ref:` input). The migration bot makes that bump for you in a PR — or do it by hand anytime.
+
+**If `agent-template` changes** (the starter files — the **COPY** side): the migration bot runs `copier update` on your repo and opens a PR with the new template files merged in — your `/api` + `/mcp` code is preserved. Or run `copier update` yourself.
+
+**Either way:** nothing merges without you, and every update PR passes through your gate first. (The bot lives in [agent-registry](https://github.com/turingplanet/agent-registry) and reads the fleet list there.)
 
 ## Plain-language glossary
 
@@ -115,7 +117,7 @@ Old versions (`v0.0.1…v0.0.4`) stay frozen forever, so nothing breaks under yo
 | **member repo** | your own repo, with your code |
 | **PR** (pull request) | a request to merge a change; checks run before it can merge |
 | **the gate** | the automatic pass/fail (the tests are the judge; the AI just advises) |
-| **`@v0.0.4`** | which frozen version of the shared rules your repo follows |
+| **`@vN`** | which frozen version of the shared rules your repo follows (e.g. `@v0.0.7`) |
 
 ## Where to go next
 
@@ -127,7 +129,3 @@ Old versions (`v0.0.1…v0.0.4`) stay frozen forever, so nothing breaks under yo
 ## Status
 
 Architecture 1 (build → review → gate) works end-to-end today: a PR runs the full flow and the gate decides. Architecture 2 (release / deploy) and Architecture 3 (the MCP gateway) are next.
-
-## Full design
-
-The complete architecture design lives in Notion: _<add your Notion share link here>_.
