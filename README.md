@@ -49,24 +49,24 @@ flowchart TB
 
 ## 3. How you build an agent (start here)
 
-You do **not** fork anything. Each agent is its **own repo that you own**:
+Each agent is its **own repo that you own**, scaffolded from `agent-template` with **[Copier](https://copier.readthedocs.io)**:
 
 ```mermaid
 flowchart TB
-    A["You want to build an agent"] --> B["Click 'Use this template' on agent-template<br/>(this is NOT a Fork)"]
-    B --> C["You get a brand-new repo YOU own:<br/>a detached copy, no link back to the template"]
-    C --> D["Write code in /api + /mcp,<br/>fill in agent.manifest.yaml"]
-    D --> E["Open a Pull Request INSIDE your repo<br/>(your branch → your main)"]
-    E --> F["The review flow runs<br/>(pulled live from policies@vN)"]
+    A["You want to build an agent"] --> B["Scaffold with Copier:<br/>copier copy gh:turingplanet/agent-template ./my-agent"]
+    B --> C["A new repo YOU own, with a .copier-answers.yml<br/>recording which template version it came from"]
+    C --> D["Replace the placeholder code in /api + /mcp,<br/>edit agent.manifest.yaml if needed"]
+    D --> E["Open a Pull Request inside your repo<br/>(your branch → your main)"]
+    E --> F["The review flow runs (from policies@vN)"]
     F --> G{"🚦 Gate: did the hard checks pass?"}
-    G -- "yes ✅" --> H["It merges into your main"]
+    G -- "yes ✅" --> H["Merge into your main"]
     G -- "no ❌" --> D
 ```
 
-**The two things people get confused about:**
+**Two things worth knowing:**
 
-- **"Use this template" vs "Fork".** On `agent-template`, click GitHub's **"Use this template"** button. That makes a brand-new repo you own, with the files but **no link back** to the template. A **Fork** is different — it stays *connected* to the original (it's for sending changes *back* to it), which you don't want here. So: **template = "Use this template", never fork.**
-- **"Open a PR" = a PR inside *your own* repo.** Once you have your repo, you don't save changes straight to your `main`. You make a branch, then **open a pull request** (your branch → your `main`). Opening that PR is what starts the automatic review. It is *not* sending anything to the platform — it all happens in your repo. (Same "review before you merge" habit you'd use with a human reviewer.)
+- **Copier remembers where your repo came from.** Scaffolding writes a `.copier-answers.yml` that pins the template version — which is what lets you later run **`copier update`** to pull new template changes as a PR (a 3-way merge: your code is preserved, conflicts come out as markers to resolve).
+- **"Open a PR" = a PR inside *your own* repo.** You don't save changes straight to your `main`. You make a branch, then **open a pull request** (your branch → your `main`). Opening it starts the automatic review, and the gate decides whether it merges. It all happens in your repo — nothing is sent to the platform. (The same "review before you merge" habit you'd use with a human reviewer.)
 
 ## 4. What happens when you open a PR
 
@@ -110,7 +110,7 @@ Old versions (`v1…v4`) stay frozen forever, so nothing breaks under you. You u
 | **the anchor** | the fixed name + location of that card, so every tool can find it |
 | **COPY** | photocopy the starter kit once; your copy then goes its own way |
 | **REFERENCE** | link to the shared rules by version; bump the version to get updates |
-| **`agent-template`** | the starter kit you photocopy ("Use this template") |
+| **`agent-template`** | the Copier template you scaffold a new agent from |
 | **`policies`** | the shared rulebook + robot reviewer your repo links to |
 | **member repo** | your own repo, with your code |
 | **PR** (pull request) | a request to merge a change; checks run before it can merge |
