@@ -98,7 +98,7 @@ flowchart LR
     ADOPT --> MC["member C ✓"]
 ```
 
-Old versions (`v1…v4`) stay frozen forever, so nothing breaks under you. You upgrade when you're ready by bumping one line. (A change to the **template** is different — it would need a manual migration in each repo. That's the COPY side, and it's deliberately slower.)
+Old versions (`v1…v4`) stay frozen forever, so nothing breaks under you. You upgrade when you're ready by bumping one line. Template changes (the **COPY** side) are handled in the same spirit, automatically: the [agent-registry](https://github.com/turingplanet/agent-registry) **migration bot** runs `copier update` across the fleet and opens a PR per repo — never auto-merging, so each change still passes through your gate.
 
 ## Plain-language glossary
 
@@ -122,6 +122,7 @@ Old versions (`v1…v4`) stay frozen forever, so nothing breaks under you. You u
 - **Want the rules / the reviewer?** → [policies](https://github.com/turingplanet/policies)
 - **Want the starter kit?** → [agent-template](https://github.com/turingplanet/agent-template)
 - **Want a worked example?** → [hello-agent](https://github.com/enochhz/hello-agent)
+- **The fleet inventory + auto-migration bot?** → [agent-registry](https://github.com/turingplanet/agent-registry)
 
 ## Status
 
