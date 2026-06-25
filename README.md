@@ -45,6 +45,32 @@ flowchart LR
     REG ==>|"3. SYNC — bot opens copier update PR (GitHub App; never auto-merges)"| MEM
 ```
 
+<details>
+<summary>Plain-text / terminal version (same diagram, no Mermaid needed)</summary>
+
+```text
+PLATFORM (turingplanet):  agent-template  ·  policies@vN  ·  agent-registry
+YOU:                      your-agent   (/api · /mcp · review.yml)
+
+(1) COPY ....... once, you run it
+    agent-template  ──copier copy──▶  your-agent          (then detaches)
+
+(2) REFERENCE .. every PR, live, automatic
+    your-agent  ···review.yml @vN···▶  policies@vN         (gate runs in YOUR CI)
+
+(3) SYNC ....... maintenance, the platform pushes
+    agent-registry bot  ══copier-update PR══▶  your-agent
+                        (reads members.yaml · GitHub App · never auto-merges)
+
+plumbing:
+    new agent-template version  ──▶  triggers a bot run
+    your-agent  ──added by hand──▶  members.yaml           (so the bot knows you)
+
+Only (3) pushes to your repo — and only as a PR you merge.
+(1) is a pull you start; (2) is your CI reaching OUT to policies — it never reaches in.
+```
+</details>
+
 - **① COPY** — *one-time*: you run `copier copy`; the scaffold lands in your repo, then detaches. (→ §3)
 - **② REFERENCE** — *every PR, live*: your `review.yml` calls `policies@vN` in your own CI — the gate runs there, nothing is pushed to you. (→ §4, §5)
 - **③ SYNC** — *maintenance*: the agent-registry bot opens `copier update` PRs (policies-version bumps ride along too), authenticated by a GitHub App, never auto-merging. (→ §5)
