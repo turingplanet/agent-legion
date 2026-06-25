@@ -25,6 +25,32 @@ flowchart TB
 
 The platform team owns the first two (**the rails**); you own the third (**the cargo**).
 
+## The repos & the three actions, at a glance
+
+§1 is the member's-eye view — two rails plus your repo. Zoom out to include the platform's maintenance repo (**agent-registry**), and the whole system is just **three actions** connecting the repos:
+
+```mermaid
+flowchart LR
+    subgraph PLAT["Platform · turingplanet"]
+        TPL["agent-template<br/>the scaffold"]
+        POL["policies@vN<br/>review flow · schema · AI reviewer"]
+        REG["agent-registry<br/>members.yaml + migration bot"]
+    end
+    MEM["your-agent<br/>(your account)<br/>/api · /mcp · review.yml"]
+
+    TPL -->|"1. COPY — scaffold once (copier copy); then detaches"| MEM
+    MEM -.->|"2. REFERENCE — every PR: review.yml calls policies@vN"| POL
+    MEM -->|"registered by hand in members.yaml"| REG
+    TPL -->|"new version triggers a run"| REG
+    REG ==>|"3. SYNC — bot opens copier update PR (GitHub App; never auto-merges)"| MEM
+```
+
+- **① COPY** — *one-time*: you run `copier copy`; the scaffold lands in your repo, then detaches. (→ §3)
+- **② REFERENCE** — *every PR, live*: your `review.yml` calls `policies@vN` in your own CI — the gate runs there, nothing is pushed to you. (→ §4, §5)
+- **③ SYNC** — *maintenance*: the agent-registry bot opens `copier update` PRs (policies-version bumps ride along too), authenticated by a GitHub App, never auto-merging. (→ §5)
+
+**Only ③ ever _pushes_ to your repo — and only as a PR you merge.** ① is a one-time pull you start; ② is your CI reaching *out* to policies — policies never reaches *in*.
+
 ## 2. The two ways things connect: COPY vs REFERENCE
 
 This is the one idea that makes everything else click. Repos connect to the shared ones in **two different ways**:
