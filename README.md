@@ -102,6 +102,14 @@ flowchart LR
 
 **Either way:** nothing merges without you, and every update PR passes through your gate first. (The bot lives in [agent-registry](https://github.com/turingplanet/agent-registry) and reads the fleet list there.)
 
+## Common questions
+
+| Question | Short answer | More |
+| --- | --- | --- |
+| **How do I generate a repo from the template?** | Scaffold with Copier (`copier copy gh:turingplanet/agent-template ./my-agent`), push it as your own repo, smoke-test it, then write your code. | [§3](#3-how-you-build-an-agent-start-here) · [agent-template](https://github.com/turingplanet/agent-template) |
+| **`policies` changed — do I update by hand? Will I be told?** | You're **pinned and never force-updated**. Adopt by bumping the version in your `review.yml` (the `uses:@vN` line **and** its matching `policies_ref:`). The migration bot opens that PR for you — **the PR is the notification** — or do it by hand anytime. | [§5](#5-how-updates-reach-you) · [policies](https://github.com/turingplanet/policies) |
+| **The template changed — do I update by hand? Will I be told?** | The migration bot opens a `copier update` PR on your repo automatically (again, the PR is the notification); or run `copier update` yourself. Your `/api` + `/mcp` code is preserved either way. | [§5](#5-how-updates-reach-you) · [agent-template](https://github.com/turingplanet/agent-template) |
+
 ## Plain-language glossary
 
 | You'll see… | It means… |
