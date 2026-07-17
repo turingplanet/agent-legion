@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图灵星球 Agent 军团 · Agent Legion</title>
+<meta name="description" content="A platform for building and running lots of small AI agents over MCP. You own your code; the platform owns the rails.">
+<style>
+  :root{
+    --bg:#fdfdfc; --fg:#1a1d21; --muted:#5c6470; --line:#e6e4df;
+    --accent:#1a56db; --accent-soft:#eef3fe; --ok:#0e7a4d; --ok-soft:#e9f7f0;
+    --card:#ffffff; --code-bg:#f4f4f2; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg);line-height:1.65}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(253,253,252,.92);backdrop-filter:blur(8px);z-index:10}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:16px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:1.02rem}
+  .brand small{color:var(--muted);font-weight:500;margin-left:8px}
+  .nav-links{display:flex;gap:18px;align-items:center;font-size:.92rem;flex-wrap:wrap}
+  .lang-btn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 14px;cursor:pointer;font-size:.85rem;color:var(--fg)}
+  .lang-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .hero{padding:64px 0 40px;text-align:center}
+  .hero h1{font-size:2.1rem;margin:0 0 14px;line-height:1.3}
+  .hero p.tagline{font-size:1.15rem;color:var(--muted);max-width:640px;margin:0 auto 28px}
+  .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:10px 22px;border-radius:8px;font-weight:600;font-size:.95rem}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{text-decoration:none;filter:brightness(1.1)}
+  .btn.ghost{border:1px solid var(--line);color:var(--fg)}
+  .btn.ghost:hover{text-decoration:none;border-color:var(--accent);color:var(--accent)}
+  section{padding:44px 0;border-top:1px solid var(--line)}
+  h2{font-size:1.45rem;margin:0 0 8px}
+  .sub{color:var(--muted);margin:0 0 26px;max-width:680px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .card h3{margin:0 0 8px;font-size:1.02rem}
+  .card p{margin:0;font-size:.92rem;color:var(--muted)}
+  .badge{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.04em;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-bottom:10px}
+  .badge.green{background:var(--ok-soft);color:var(--ok)}
+  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:.86rem;line-height:1.55;position:relative}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  p code, li code{background:var(--code-bg);padding:1px 6px;border-radius:5px;font-size:.88em}
+  .copy-btn{position:absolute;top:8px;right:8px;border:1px solid var(--line);background:var(--card);border-radius:6px;padding:2px 10px;font-size:.75rem;cursor:pointer;color:var(--muted)}
+  .copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+  .mermaid{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:20px 0;overflow-x:auto}
+  .trust-list{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+  .trust-list li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
+  .trust-list .tick{color:var(--ok);font-weight:800;flex-shrink:0}
+  .callout{background:var(--accent-soft);border:1px solid #c9d9f8;border-radius:var(--radius);padding:18px 22px;margin-top:24px}
+  .callout strong{color:var(--accent)}
+  table{border-collapse:collapse;width:100%;font-size:.9rem}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--code-bg)}
+  .steps{counter-reset:step;list-style:none;padding:0;margin:0;display:grid;gap:14px}
+  .steps li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px 16px 56px;position:relative}
+  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:16px;top:16px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+  footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--muted);font-size:.88rem}
+  footer .links{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px}
+  /* language toggle */
+  body.lang-zh .en{display:none}
+  body.lang-en .zh{display:none}
+  @media (max-width:600px){.hero h1{font-size:1.6rem}.hero{padding:44px 0 32px}}
+</style>
+</head>
+<body class="lang-zh">
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">🛰️ 图灵星球 Agent 军团<small>Agent Legion</small></div>
+    <nav class="nav-links">
+      <a href="#how"><span class="zh">怎么运作</span><span class="en">How it works</span></a>
+      <a href="#trust"><span class="zh">为什么可信</span><span class="en">Why trust it</span></a>
+      <a href="#install"><span class="zh">你到底装了什么</span><span class="en">What you install</span></a>
+      <a href="#try"><span class="zh">30 秒试用</span><span class="en">Try in 30s</span></a>
+      <a href="#start"><span class="zh">快速开始</span><span class="en">Quickstart</span></a>
+      <a href="https://github.com/turingplanet/agent-legion">GitHub</a>
+      <button class="lang-btn" id="langToggle">EN</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <h1>
+      <span class="zh">你写自己的 Agent，<br>平台提供公共轨道。</span>
+      <span class="en">You write your agent.<br>The platform provides the rails.</span>
+    </h1>
+    <p class="tagline">
+      <span class="zh">一个用来构建和运行大量小型 AI Agent（通过 <strong>MCP</strong> 提供服务）的平台。代码在<strong>你自己的仓库</strong>里，归你所有；平台提供共享的机制 —— 启动模板、自动审查、更新机器人。</span>
+      <span class="en">A platform for building and running many small AI agents, served over <strong>MCP</strong>. Your code lives in <strong>your own repo</strong>, owned by you; the platform supplies the shared machinery — a starter kit, an automatic reviewer, and an update bot.</span>
+    </p>
+    <div class="cta-row">
+      <a class="btn primary" href="#start"><span class="zh">快速开始</span><span class="en">Quickstart</span></a>
+      <a class="btn ghost" href="#try"><span class="zh">先试 30 秒，不装任何东西</span><span class="en">Try 30s, install nothing</span></a>
+    </div>
+  </div>
+
+  <section id="how">
+    <h2><span class="zh">怎么运作：三个仓库，三个动作</span><span class="en">How it works: three repos, three actions</span></h2>
+    <p class="sub">
+      <span class="zh">整个系统只有三类仓库、三个连接动作。平台拥有「轨道」（模板和规则），你拥有「货物」（你的 Agent）。</span>
+      <span class="en">The whole system is three kinds of repos connected by three actions. The platform owns the rails (template and rules); you own the cargo (your agent).</span>
+    </p>
+    <pre class="mermaid">
+flowchart LR
+    subgraph PLAT["Platform · turingplanet"]
+        TPL["agent-template<br/>the scaffold"]
+        POL["policies@vN<br/>review flow · schema · AI reviewer"]
+        REG["agent-registry<br/>members.yaml + migration bot"]
+    end
+    MEM["your-agent<br/>(your account)<br/>/api · /mcp · review.yml"]
+
+    TPL -->|"1. COPY — scaffold once; then detaches"| MEM
+    MEM -.->|"2. REFERENCE — every PR calls policies@vN"| POL
+    MEM -->|"registered in members.yaml"| REG
+    REG ==>|"3. SYNC — bot opens update PR, never auto-merges"| MEM
+    </pre>
+    <div class="cards">
+      <div class="card">
+        <span class="badge">1 · COPY</span>
+        <h3><span class="zh">复印一次，然后是你的</span><span class="en">Copied once, then yours</span></h3>
+        <p><span class="zh">用 <code>copier copy</code> 从模板生成你的仓库 —— 就像复印一张菜谱卡。之后这份副本完全属于你，模板再变也不会自动改你的代码。</span><span class="en">Scaffold your repo from the template with <code>copier copy</code> — like photocopying a recipe card. The copy is yours; later template changes never touch your code on their own.</span></p>
+      </div>
+      <div class="card">
+        <span class="badge">2 · REFERENCE</span>
+        <h3><span class="zh">按版本号引用规则</span><span class="en">Rules pinned by version</span></h3>
+        <p><span class="zh">你的 CI 引用 <code>policies@vN</code> —— 固定版本、永不强制升级。审查在<strong>你自己的仓库</strong>里跑，什么都不会发给平台。</span><span class="en">Your CI references <code>policies@vN</code> — pinned, never force-upgraded. Review runs inside <strong>your own repo</strong>; nothing is sent to the platform.</span></p>
+      </div>
+      <div class="card">
+        <span class="badge">3 · SYNC</span>
+        <h3><span class="zh">更新以 PR 形式送达</span><span class="en">Updates arrive as PRs</span></h3>
+        <p><span class="zh">平台发新版本时，机器人在你的仓库开一个 PR —— 这就是通知本身。<strong>永远不会自动合并</strong>，合不合并由你决定。</span><span class="en">When the platform ships a new version, a bot opens a PR on your repo — the PR is the notification. It <strong>never auto-merges</strong>; merging is your call.</span></p>
+      </div>
+    </div>
+    <p style="margin-top:20px;font-size:.93rem;color:var(--muted)">
+      <span class="zh">另外一条规则贯穿始终：<strong>门禁做决定，AI 只提建议。</strong>PR 能否合并由确定性的自动检查（安装、测试、lint、安全扫描）说了算；AI 审查员只留评论，永远无权拦截你的 PR。</span>
+      <span class="en">One rule runs through everything: <strong>the gate decides, the AI only advises.</strong> Whether a PR can merge is determined by deterministic checks (install, tests, lint, security). The AI reviewer leaves comments only — it can never block you.</span>
+    </p>
+  </section>
+
+  <section id="trust">
+    <h2><span class="zh">为什么可以信任它</span><span class="en">Why you can trust it</span></h2>
+    <p class="sub">
+      <span class="zh">这个平台是按「怀疑者优先」设计的。以下每一条都可以在公开代码里自己验证。</span>
+      <span class="en">This platform was designed skeptic-first. Every claim below is verifiable in the public code.</span>
+    </p>
+    <ul class="trust-list">
+      <li><span class="tick">✓</span><div>
+        <span class="zh"><strong>一切公开、可审计。</strong>模板（<a href="https://github.com/turingplanet/agent-template">agent-template</a>）、规则与审查流程（<a href="https://github.com/turingplanet/policies">policies</a>）、本文档，全部是公开仓库。没有任何隐藏逻辑。</span>
+        <span class="en"><strong>Everything is public and auditable.</strong> The template (<a href="https://github.com/turingplanet/agent-template">agent-template</a>), the rules and review flow (<a href="https://github.com/turingplanet/policies">policies</a>), and these docs are all public repos. No hidden logic.</span>
+      </div></li>
+      <li><span class="tick">✓</span><div>
+        <span class="zh"><strong>模板不含、也不索取任何密钥。</strong>脚手架生成的代码里没有 secret，不要求你交出任何 token。AI 审查用的 API key 由你自己保管、放在你自己仓库的 secret 里，不配置就自动跳过。</span>
+        <span class="en"><strong>The template contains no secrets and asks for none.</strong> The scaffold ships zero secrets and never asks you to hand over a token. The AI-review API key is yours, stored in your own repo's secrets — leave it unset and that step is skipped gracefully.</span>
+      </div></li>
+      <li><span class="tick">✓</span><div>
+        <span class="zh"><strong>任何改动只能以 PR 形式到达你的仓库，永不自动合并。</strong>机器人没有直接改你 main 分支的能力；每个更新 PR 还要先过你自己的门禁。</span>
+        <span class="en"><strong>Changes reach your repo only as PRs, never auto-merged.</strong> The bot cannot touch your main branch directly, and every update PR must pass your own gate first.</span>
+      </div></li>
+      <li><span class="tick">✓</span><div>
+        <span class="zh"><strong>门禁是确定性的，AI 无权拦截。</strong>决定 PR 命运的是可复现的自动检查；AI 只能评论。你不会被一个黑盒模型卡住。</span>
+        <span class="en"><strong>The gate is deterministic; the AI cannot block you.</strong> Reproducible automated checks decide your PR's fate; the AI can only comment. You'll never be stuck behind a black-box model.</span>
+      </div></li>
+      <li><span class="tick">✓</span><div>
+        <span class="zh"><strong>加入舰队完全可选。</strong>你可以只用模板独立开发和部署，永远不注册。注册的唯一作用是让更新机器人知道给你的仓库开 PR。</span>
+        <span class="en"><strong>Joining the fleet is optional.</strong> You can scaffold, build, and deploy entirely on your own and never register. Registration only tells the update bot to open PRs on your repo.</span>
+      </div></li>
+    </ul>
+    <div class="callout">
+      <span class="zh"><strong>还是不放心？别信我们，问你自己的 AI。</strong>把仓库链接粘贴给 Claude 或 ChatGPT，问它：「这个模板会在我机器上装什么？那个机器人对我的仓库有什么权限？」所有代码都是公开的 —— 让你信任的助手替你读一遍。</span>
+      <span class="en"><strong>Still unsure? Don't trust us — ask your own AI.</strong> Paste the repo links into Claude or ChatGPT and ask: "What does this template install on my machine? What permissions does the bot have on my repo?" Everything is public — let the assistant you already trust read it for you.</span>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2><span class="zh">「下载仓库」？不 —— 你到底得到了什么</span><span class="en">"Download a repo"? No — here's what you actually get</span></h2>
+    <p class="sub">
+      <span class="zh">加入平台<strong>不是</strong>下载我们的代码库。<code>copier copy</code> 会为你<strong>生成一个全新的、属于你自己的仓库</strong> —— 十几个小文件，五分钟就能全部读完。以下就是全部内容：</span>
+      <span class="en">Joining does <strong>not</strong> mean downloading our codebase. <code>copier copy</code> <strong>generates a brand-new repo that belongs to you</strong> — about a dozen small files you can read in full in five minutes. This is everything:</span>
+    </p>
+    <pre><code>my-agent/
+├── agent.manifest.yaml       <span class="zh"># 你仓库的「说明卡」：怎么构建、怎么测试</span><span class="en"># your repo's index card: how to build & test</span>
+├── .copier-answers.yml       <span class="zh"># 记录模板版本，未来更新用</span><span class="en"># records the template version, for future updates</span>
+├── config.py                 <span class="zh"># 唯一的配置文件（端口 / 模型 / 环境变量）</span><span class="en"># the single config file (port / model / env vars)</span>
+├── pyproject.toml            <span class="zh"># Python 依赖（poetry）</span><span class="en"># Python dependencies (poetry)</span>
+├── railpack.json             <span class="zh"># 一键部署到 Railway 的启动配置</span><span class="en"># zero-config deploy to Railway</span>
+├── api/                      <span class="zh"># FastAPI 接口 —— 你的业务逻辑写在这里</span><span class="en"># FastAPI endpoints — your business logic goes here</span>
+├── mcp_server/               <span class="zh"># MCP 服务器 —— 让 AI 客户端连接你的 Agent</span><span class="en"># the MCP server — lets AI clients connect to your agent</span>
+├── tests/                    <span class="zh"># 起步测试</span><span class="en"># starter tests</span>
+├── scripts/                  <span class="zh"># 可选：注册进舰队的脚本</span><span class="en"># optional: the fleet-registration script</span>
+└── .github/workflows/
+    └── review.yml            <span class="zh"># 你的 CI：引用 policies@vN 跑审查门禁</span><span class="en"># your CI: references policies@vN to run the gate</span></code></pre>
+    <p style="font-size:.93rem;color:var(--muted)">
+      <span class="zh">没有安装器、没有后台进程、没有向外发送数据的代码。生成之后它就是一个普通的 Python 小项目，跑不跑、传不传 GitHub、部不部署，全由你决定。</span>
+      <span class="en">No installer, no background process, no code that phones home. Once generated it's just a small ordinary Python project — whether you run it, push it, or deploy it is entirely up to you.</span>
+    </p>
+  </section>
+
+  <section id="try">
+    <h2><span class="zh">先试 30 秒 —— 什么都不用装</span><span class="en">Try it in 30 seconds — install nothing</span></h2>
+    <p class="sub">
+      <span class="zh">舰队里的 Agent 就是一个可连接的 MCP 服务。用 Claude Code 一条命令连上一个真实在线的成员 Agent，亲手调用它的工具：</span>
+      <span class="en">A fleet agent is simply a connectable MCP service. With one Claude Code command, connect to a real, live member agent and call its tools yourself:</span>
+    </p>
+    <pre><button class="copy-btn" data-copy>copy</button><code>claude mcp add --transport http legion-demo https://my-agent3-production.up.railway.app/mcp</code></pre>
+    <p>
+      <span class="zh">然后在 Claude 里问一句「用 legion-demo 打个招呼」。没有 Claude Code？直接在浏览器打开它的 <a href="https://my-agent3-production.up.railway.app/docs">API 文档（Swagger）</a> 点几下试试 —— 这也是每个成员 Agent 自带的。</span>
+      <span class="en">Then ask Claude to "say hi using legion-demo". No Claude Code? Open the agent's <a href="https://my-agent3-production.up.railway.app/docs">API docs (Swagger)</a> in your browser and click around — every member agent ships this too.</span>
+    </p>
+    <p style="font-size:.93rem;color:var(--muted)">
+      <span class="zh">你刚刚体验到的，就是你自己的 Agent 部署后的样子：一个 <code>/mcp</code> 端点给 AI 客户端，一个 <code>/api</code> 给普通 HTTP 调用。</span>
+      <span class="en">What you just experienced is exactly what your own agent looks like once deployed: an <code>/mcp</code> endpoint for AI clients, plus <code>/api</code> for plain HTTP.</span>
+    </p>
+  </section>
+
+  <section id="start">
+    <h2><span class="zh">快速开始</span><span class="en">Quickstart</span></h2>
+    <p class="sub">
+      <span class="zh">前置条件：Python 3.11+、<a href="https://copier.readthedocs.io">Copier</a>、<a href="https://python-poetry.org">Poetry</a>。</span>
+      <span class="en">Prerequisites: Python 3.11+, <a href="https://copier.readthedocs.io">Copier</a>, <a href="https://python-poetry.org">Poetry</a>.</span>
+    </p>
+    <ol class="steps">
+      <li>
+        <strong><span class="zh">生成你自己的 Agent 仓库</span><span class="en">Generate your own agent repo</span></strong>
+        <pre><button class="copy-btn" data-copy>copy</button><code>copier copy gh:turingplanet/agent-template ./my-agent && cd my-agent</code></pre>
+        <span class="zh">回答几个问题（项目名默认取文件夹名；是否注册进舰队 —— 可以选否）。</span>
+        <span class="en">Answer a few questions (project name defaults to the folder; fleet registration — feel free to say no).</span>
+      </li>
+      <li>
+        <strong><span class="zh">本地跑起来，冒烟测试</span><span class="en">Run it locally, smoke-test</span></strong>
+        <pre><button class="copy-btn" data-copy>copy</button><code>poetry install && poetry run pytest</code></pre>
+        <span class="zh">让 Claude 直接连上本地的 MCP 服务器：</span>
+        <span class="en">Connect Claude straight to the local MCP server:</span>
+        <pre><button class="copy-btn" data-copy>copy</button><code>claude mcp add my-agent -- poetry -C "$(pwd)" run python "$(pwd)/mcp_server/server.py"</code></pre>
+      </li>
+      <li>
+        <strong><span class="zh">写你的业务逻辑</span><span class="en">Write your business logic</span></strong><br>
+        <span class="zh">改 <code>api/</code> 和 <code>mcp_server/</code> 里的占位代码。开 PR 时，你仓库自己的门禁会跑安装、测试、lint、安全检查。</span>
+        <span class="en">Replace the placeholder code in <code>api/</code> and <code>mcp_server/</code>. When you open a PR, your repo's own gate runs install, tests, lint, and security checks.</span>
+      </li>
+      <li>
+        <strong><span class="zh">（可选）一键部署</span><span class="en">(Optional) Deploy in one step</span></strong><br>
+        <span class="zh">仓库自带 Railway 零配置部署（<code>railpack.json</code>）—— 推上 GitHub、在 Railway 里选中仓库即可上线，自动获得公网 <code>/mcp</code> 和 <code>/api</code>。生成的 README 里有完整步骤。</span>
+        <span class="en">The repo ships zero-config Railway deployment (<code>railpack.json</code>) — push to GitHub, select the repo in Railway, and you're live with a public <code>/mcp</code> and <code>/api</code>. Full steps are in your generated README.</span>
+      </li>
+    </ol>
+  </section>
+
+  <section id="faq">
+    <h2><span class="zh">常见问题</span><span class="en">Common questions</span></h2>
+    <table>
+      <tr>
+        <th><span class="zh">问题</span><span class="en">Question</span></th>
+        <th><span class="zh">简短回答</span><span class="en">Short answer</span></th>
+      </tr>
+      <tr>
+        <td><span class="zh">规则（policies）更新了，我要手动跟进吗？会有人通知我吗？</span><span class="en">policies changed — do I update by hand? Will I be told?</span></td>
+        <td><span class="zh">你被固定在指定版本上，<strong>永远不会被强制升级</strong>。机器人会在你的仓库开一个升级 PR —— 那个 PR 就是通知；也可以随时手动改版本号。</span><span class="en">You're pinned and <strong>never force-upgraded</strong>. The bot opens an upgrade PR on your repo — that PR is the notification; or bump the version by hand anytime.</span></td>
+      </tr>
+      <tr>
+        <td><span class="zh">模板更新了怎么办？我的代码会被覆盖吗?</span><span class="en">The template changed — will my code get overwritten?</span></td>
+        <td><span class="zh">机器人开一个 <code>copier update</code> PR，三方合并<strong>保留你的代码</strong>；有冲突会以标记形式留给你解决。不合并就什么都不变。</span><span class="en">The bot opens a <code>copier update</code> PR; the 3-way merge <strong>preserves your code</strong>, and conflicts surface as markers for you to resolve. Don't merge, and nothing changes.</span></td>
+      </tr>
+      <tr>
+        <td><span class="zh">AI 审查会拦住我的 PR 吗？</span><span class="en">Can the AI review block my PR?</span></td>
+        <td><span class="zh">不会。AI 只能留评论；能否合并只由确定性的自动检查决定。</span><span class="en">No. The AI can only comment; merging is decided solely by the deterministic checks.</span></td>
+      </tr>
+      <tr>
+        <td><span class="zh">我可以退出吗？</span><span class="en">Can I leave?</span></td>
+        <td><span class="zh">随时。你的仓库本来就归你；从 members.yaml 移除后机器人不再给你开 PR，你的 Agent 照常运行。</span><span class="en">Anytime. Your repo was always yours; removal from members.yaml just stops the bot's PRs — your agent keeps running unchanged.</span></td>
+      </tr>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="https://github.com/turingplanet/agent-legion"><span class="zh">架构文档</span><span class="en">Architecture docs</span> (agent-legion)</a>
+      <a href="https://github.com/turingplanet/agent-template"><span class="zh">启动模板</span><span class="en">Starter kit</span> (agent-template)</a>
+      <a href="https://github.com/turingplanet/policies"><span class="zh">规则与审查</span><span class="en">Rules & review</span> (policies)</a>
+      <a href="https://github.com/enochhz/hello-agent"><span class="zh">示例成员</span><span class="en">Worked example</span> (hello-agent)</a>
+    </div>
+    <div>图灵星球 Agent 军团 · Agent Legion — <span class="zh">所有轨道代码公开可审计。</span><span class="en">All rails code is public and auditable.</span></div>
+  </div>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+</script>
+<script>
+  const btn = document.getElementById("langToggle");
+  const setLang = (l) => {
+    document.body.className = "lang-" + l;
+    document.documentElement.lang = l === "zh" ? "zh-CN" : "en";
+    btn.textContent = l === "zh" ? "EN" : "中文";
+    localStorage.setItem("legion-lang", l);
+  };
+  btn.addEventListener("click", () =>
+    setLang(document.body.classList.contains("lang-zh") ? "en" : "zh"));
+  setLang(localStorage.getItem("legion-lang") || "zh");
+
+  document.querySelectorAll("[data-copy]").forEach((b) => {
+    b.addEventListener("click", () => {
+      navigator.clipboard.writeText(b.parentElement.querySelector("code").innerText.trim());
+      b.textContent = "✓";
+      setTimeout(() => (b.textContent = "copy"), 1200);
+    });
+  });
+</script>
+</body>
+</html>
