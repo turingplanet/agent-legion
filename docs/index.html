@@ -4,73 +4,183 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>图灵星球 Agent 军团 · Agent Legion</title>
-<meta name="description" content="A platform for building and running lots of small AI agents over MCP. You own your code; the platform owns the rails.">
+<meta name="description" content="A platform for building and running many small AI agents over MCP. You own your code; the platform owns the rails.">
+<meta name="theme-color" content="#0a0d13">
+<meta property="og:title" content="图灵星球 Agent 军团 · Agent Legion">
+<meta property="og:description" content="You write your agent. The platform provides the rails. Build & run small AI agents over MCP — your code stays in your own repo.">
+<meta property="og:url" content="https://agents.turingplanet.ai/">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#fdfdfc; --fg:#1a1d21; --muted:#5c6470; --line:#e6e4df;
-    --accent:#1a56db; --accent-soft:#eef3fe; --ok:#0e7a4d; --ok-soft:#e9f7f0;
-    --card:#ffffff; --code-bg:#f4f4f2; --radius:12px;
+    --bg:#0a0d13; --bg2:#0e1219; --panel:#11151f; --panel2:#151a26;
+    --line:#1e2532; --line2:#2a3242;
+    --fg:#e8ebf2; --muted:#98a2b5; --dim:#6b7487;
+    --a1:#818cf8; --a2:#38bdf8; --ok:#34d399;
+    --grad:linear-gradient(100deg,#818cf8,#38bdf8);
+    --radius:14px;
+    --font:"Inter","Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg);line-height:1.65}
-  a{color:var(--accent);text-decoration:none}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.7;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:var(--a2);text-decoration:none}
   a:hover{text-decoration:underline}
-  .wrap{max-width:900px;margin:0 auto;padding:0 24px}
-  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(253,253,252,.92);backdrop-filter:blur(8px);z-index:10}
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:16px;flex-wrap:wrap}
-  .brand{font-weight:700;font-size:1.02rem}
-  .brand small{color:var(--muted);font-weight:500;margin-left:8px}
-  .nav-links{display:flex;gap:18px;align-items:center;font-size:.92rem;flex-wrap:wrap}
-  .lang-btn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 14px;cursor:pointer;font-size:.85rem;color:var(--fg)}
-  .lang-btn:hover{border-color:var(--accent);color:var(--accent)}
-  .hero{padding:64px 0 40px;text-align:center}
-  .hero h1{font-size:2.1rem;margin:0 0 14px;line-height:1.3}
-  .hero p.tagline{font-size:1.15rem;color:var(--muted);max-width:640px;margin:0 auto 28px}
-  .cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .btn{display:inline-block;padding:10px 22px;border-radius:8px;font-weight:600;font-size:.95rem}
-  .btn.primary{background:var(--accent);color:#fff}
-  .btn.primary:hover{text-decoration:none;filter:brightness(1.1)}
-  .btn.ghost{border:1px solid var(--line);color:var(--fg)}
-  .btn.ghost:hover{text-decoration:none;border-color:var(--accent);color:var(--accent)}
-  section{padding:44px 0;border-top:1px solid var(--line)}
-  h2{font-size:1.45rem;margin:0 0 8px}
-  .sub{color:var(--muted);margin:0 0 26px;max-width:680px}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
-  .card h3{margin:0 0 8px;font-size:1.02rem}
-  .card p{margin:0;font-size:.92rem;color:var(--muted)}
-  .badge{display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.04em;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-bottom:10px}
-  .badge.green{background:var(--ok-soft);color:var(--ok)}
-  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:.86rem;line-height:1.55;position:relative}
-  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  p code, li code{background:var(--code-bg);padding:1px 6px;border-radius:5px;font-size:.88em}
-  .copy-btn{position:absolute;top:8px;right:8px;border:1px solid var(--line);background:var(--card);border-radius:6px;padding:2px 10px;font-size:.75rem;cursor:pointer;color:var(--muted)}
-  .copy-btn:hover{color:var(--accent);border-color:var(--accent)}
-  .mermaid{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin:20px 0;overflow-x:auto}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 24px}
+
+  /* ambient glows + grid */
+  .fx{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .fx::before{content:"";position:absolute;inset:0;
+    background-image:linear-gradient(rgba(129,140,248,.045) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(129,140,248,.045) 1px,transparent 1px);
+    background-size:44px 44px;
+    mask-image:radial-gradient(ellipse 90% 55% at 50% 0%,#000 45%,transparent 100%)}
+  .fx::after{content:"";position:absolute;top:-260px;left:50%;transform:translateX(-50%);
+    width:900px;height:560px;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(129,140,248,.22),rgba(56,189,248,.10),transparent);
+    filter:blur(40px)}
+  main,header,footer{position:relative;z-index:1}
+
+  /* nav */
+  header{position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(30,37,50,.7);
+    background:rgba(10,13,19,.72);backdrop-filter:blur(14px)}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:14px;flex-wrap:wrap}
+  .brand{font-weight:800;font-size:1rem;letter-spacing:.01em;display:flex;align-items:center;gap:9px}
+  .brand .logo{font-size:1.15rem}
+  .brand small{color:var(--dim);font-weight:500}
+  .nav-links{display:flex;gap:20px;align-items:center;font-size:.9rem;flex-wrap:wrap}
+  .nav-links a{color:var(--muted)}
+  .nav-links a:hover{color:var(--fg);text-decoration:none}
+  .lang-btn{border:1px solid var(--line2);background:transparent;border-radius:999px;
+    padding:4px 15px;cursor:pointer;font-size:.82rem;color:var(--muted);font-family:var(--font)}
+  .lang-btn:hover{border-color:var(--a1);color:var(--fg)}
+
+  /* hero */
+  .hero{padding:88px 0 30px;text-align:center}
+  .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line2);
+    border-radius:999px;padding:5px 16px;font-size:.8rem;color:var(--muted);
+    background:rgba(17,21,31,.6);margin-bottom:28px}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);
+    box-shadow:0 0 10px var(--ok);animation:pulse 2.2s infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  .hero h1{font-size:clamp(2rem,5.4vw,3.3rem);margin:0 0 20px;line-height:1.22;font-weight:800;letter-spacing:-.02em}
+  .hero h1 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.tagline{font-size:1.08rem;color:var(--muted);max-width:640px;margin:0 auto 34px}
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:56px}
+  .btn{display:inline-block;padding:12px 26px;border-radius:10px;font-weight:600;font-size:.95rem;transition:.18s}
+  .btn.primary{background:var(--grad);color:#0a0d13}
+  .btn.primary:hover{text-decoration:none;transform:translateY(-1px);box-shadow:0 8px 30px rgba(99,120,248,.35)}
+  .btn.ghost{border:1px solid var(--line2);color:var(--fg);background:rgba(17,21,31,.5)}
+  .btn.ghost:hover{text-decoration:none;border-color:var(--a1)}
+
+  /* terminal */
+  .term{max-width:660px;margin:0 auto;background:#0d1017;border:1px solid var(--line2);
+    border-radius:var(--radius);box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 0 1px rgba(129,140,248,.06);
+    text-align:left;overflow:hidden}
+  .term-bar{display:flex;align-items:center;gap:7px;padding:11px 16px;border-bottom:1px solid var(--line);background:#10141d}
+  .term-bar i{width:11px;height:11px;border-radius:50%;display:block}
+  .term-bar i:nth-child(1){background:#ff5f57}.term-bar i:nth-child(2){background:#febc2e}.term-bar i:nth-child(3){background:#28c840}
+  .term-bar span{margin-left:8px;font-size:.75rem;color:var(--dim);font-family:var(--mono)}
+  .term-body{padding:18px 20px;font-family:var(--mono);font-size:.82rem;line-height:1.9;overflow-x:auto;white-space:nowrap}
+  .term-body .p{color:var(--a2)}
+  .term-body .c{color:var(--dim)}
+  .term-body .o{color:var(--ok)}
+
+  /* sections */
+  section{padding:76px 0 8px}
+  .kicker{display:inline-block;font-size:.76rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px}
+  h2{font-size:clamp(1.5rem,3vw,2rem);margin:0 0 12px;font-weight:800;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:0 0 34px;max-width:700px;font-size:1rem}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+  .card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:var(--radius);padding:24px;transition:.2s}
+  .card:hover{border-color:var(--line2);transform:translateY(-2px)}
+  .card h3{margin:0 0 10px;font-size:1.02rem;font-weight:700}
+  .card p{margin:0;font-size:.9rem;color:var(--muted)}
+  .badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;padding:3px 12px;
+    border-radius:999px;border:1px solid rgba(129,140,248,.35);color:var(--a1);
+    background:rgba(129,140,248,.08);margin-bottom:14px}
+
+  pre{background:#0d1017;border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+    overflow-x:auto;font-size:.84rem;line-height:1.65;position:relative;font-family:var(--mono)}
+  code{font-family:var(--mono)}
+  p code,li code,td code{background:rgba(129,140,248,.1);border:1px solid rgba(129,140,248,.15);
+    padding:1px 7px;border-radius:6px;font-size:.85em;color:#b9c1f6}
+  .copy-btn{position:absolute;top:10px;right:10px;border:1px solid var(--line2);background:var(--panel);
+    border-radius:7px;padding:3px 12px;font-size:.72rem;cursor:pointer;color:var(--muted);font-family:var(--font)}
+  .copy-btn:hover{color:var(--fg);border-color:var(--a1)}
+
+  .mermaid{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;margin:26px 0;overflow-x:auto;display:flex;justify-content:center}
+
+  .note{font-size:.92rem;color:var(--muted);border-left:3px solid var(--a1);
+    padding:4px 0 4px 18px;margin-top:26px}
+  .note strong{color:var(--fg)}
+
+  /* trust */
   .trust-list{list-style:none;padding:0;margin:0;display:grid;gap:12px}
-  .trust-list li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
-  .trust-list .tick{color:var(--ok);font-weight:800;flex-shrink:0}
-  .callout{background:var(--accent-soft);border:1px solid #c9d9f8;border-radius:var(--radius);padding:18px 22px;margin-top:24px}
-  .callout strong{color:var(--accent)}
-  table{border-collapse:collapse;width:100%;font-size:.9rem}
-  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
-  th{background:var(--code-bg)}
-  .steps{counter-reset:step;list-style:none;padding:0;margin:0;display:grid;gap:14px}
-  .steps li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px 16px 56px;position:relative}
-  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:16px;top:16px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center}
-  footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--muted);font-size:.88rem}
-  footer .links{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px}
-  /* language toggle */
+  .trust-list li{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:12px;padding:17px 20px;display:flex;gap:14px;align-items:flex-start;font-size:.94rem}
+  .trust-list .tick{flex-shrink:0;width:22px;height:22px;border-radius:50%;margin-top:2px;
+    background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);color:var(--ok);
+    display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800}
+  .trust-list strong{color:var(--fg)}
+  .trust-list div{color:var(--muted)}
+  .callout{background:linear-gradient(120deg,rgba(129,140,248,.1),rgba(56,189,248,.07));
+    border:1px solid rgba(129,140,248,.3);border-radius:var(--radius);padding:22px 26px;margin-top:26px;font-size:.95rem}
+  .callout strong{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* file tree */
+  .tree-note{font-size:.92rem;color:var(--muted);margin-top:18px}
+  pre .cm{color:var(--dim)}
+  pre .dir{color:var(--a2);font-weight:600}
+
+  /* steps */
+  .steps{counter-reset:step;list-style:none;padding:0;margin:0;display:grid;gap:16px}
+  .steps li{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px 22px 20px 66px;position:relative;font-size:.94rem;color:var(--muted)}
+  .steps li strong{color:var(--fg);font-size:1rem}
+  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:20px;top:20px;
+    width:30px;height:30px;border-radius:9px;background:var(--grad);color:#0a0d13;font-weight:800;
+    font-size:.9rem;display:flex;align-items:center;justify-content:center}
+  .steps pre{margin:12px 0}
+
+  /* faq */
+  table{border-collapse:separate;border-spacing:0;width:100%;font-size:.9rem;
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  th,td{padding:14px 18px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  th{background:var(--panel2);color:var(--muted);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+  td:first-child{color:var(--fg);font-weight:600;width:42%}
+  td{color:var(--muted)}
+
+  footer{border-top:1px solid var(--line);margin-top:90px;padding:38px 0 52px;color:var(--dim);font-size:.88rem}
+  footer .links{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:16px}
+  footer a{color:var(--muted)}
+  footer a:hover{color:var(--fg)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
   body.lang-zh .en{display:none}
   body.lang-en .zh{display:none}
-  @media (max-width:600px){.hero h1{font-size:1.6rem}.hero{padding:44px 0 32px}}
+  @media (max-width:640px){.hero{padding:56px 0 20px}.term-body{font-size:.72rem}}
 </style>
 </head>
 <body class="lang-zh">
+<div class="fx"></div>
 
 <header>
   <div class="wrap nav">
-    <div class="brand">🛰️ 图灵星球 Agent 军团<small>Agent Legion</small></div>
+    <div class="brand"><span class="logo">🛰️</span>图灵星球 Agent 军团<small>Agent Legion</small></div>
     <nav class="nav-links">
       <a href="#how"><span class="zh">怎么运作</span><span class="en">How it works</span></a>
       <a href="#trust"><span class="zh">为什么可信</span><span class="en">Why trust it</span></a>
@@ -86,22 +196,36 @@
 <main class="wrap">
 
   <div class="hero">
+    <div class="pill"><span class="dot"></span>
+      <span class="zh">全部代码公开 · 更新永不自动合并</span>
+      <span class="en">All code public · updates never auto-merge</span>
+    </div>
     <h1>
-      <span class="zh">你写自己的 Agent，<br>平台提供公共轨道。</span>
-      <span class="en">You write your agent.<br>The platform provides the rails.</span>
+      <span class="zh">你写自己的 Agent，<br><span class="grad">平台提供公共轨道</span></span>
+      <span class="en">You write your agent.<br><span class="grad">The platform provides the rails.</span></span>
     </h1>
     <p class="tagline">
-      <span class="zh">一个用来构建和运行大量小型 AI Agent（通过 <strong>MCP</strong> 提供服务）的平台。代码在<strong>你自己的仓库</strong>里，归你所有；平台提供共享的机制 —— 启动模板、自动审查、更新机器人。</span>
+      <span class="zh">一个用来构建和运行大量小型 AI Agent（通过 <strong>MCP</strong> 提供服务）的平台。代码在<strong>你自己的仓库</strong>里，归你所有；平台提供共享机制 —— 启动模板、自动审查、更新机器人。</span>
       <span class="en">A platform for building and running many small AI agents, served over <strong>MCP</strong>. Your code lives in <strong>your own repo</strong>, owned by you; the platform supplies the shared machinery — a starter kit, an automatic reviewer, and an update bot.</span>
     </p>
     <div class="cta-row">
       <a class="btn primary" href="#start"><span class="zh">快速开始</span><span class="en">Quickstart</span></a>
-      <a class="btn ghost" href="#try"><span class="zh">先试 30 秒，不装任何东西</span><span class="en">Try 30s, install nothing</span></a>
+      <a class="btn ghost" href="#try"><span class="zh">先试 30 秒，不装任何东西</span><span class="en">Try 30s — install nothing</span></a>
+    </div>
+    <div class="term">
+      <div class="term-bar"><i></i><i></i><i></i><span>zsh — my-agent</span></div>
+      <div class="term-body">
+<span class="p">$</span> copier copy gh:turingplanet/agent-template ./my-agent<br>
+<span class="c">🎤 project_name? <span class="o">my-agent</span> · register in fleet? <span class="o">up to you</span></span><br>
+<span class="p">$</span> cd my-agent &amp;&amp; poetry install &amp;&amp; poetry run pytest<br>
+<span class="c">✓ 4 passed — your agent is alive at /api + /mcp</span>
+      </div>
     </div>
   </div>
 
-  <section id="how">
-    <h2><span class="zh">怎么运作：三个仓库，三个动作</span><span class="en">How it works: three repos, three actions</span></h2>
+  <section id="how" class="reveal">
+    <span class="kicker"><span class="zh">架构</span><span class="en">Architecture</span></span>
+    <h2><span class="zh">三个仓库，三个动作</span><span class="en">Three repos, three actions</span></h2>
     <p class="sub">
       <span class="zh">整个系统只有三类仓库、三个连接动作。平台拥有「轨道」（模板和规则），你拥有「货物」（你的 Agent）。</span>
       <span class="en">The whole system is three kinds of repos connected by three actions. The platform owns the rails (template and rules); you own the cargo (your agent).</span>
@@ -137,13 +261,14 @@ flowchart LR
         <p><span class="zh">平台发新版本时，机器人在你的仓库开一个 PR —— 这就是通知本身。<strong>永远不会自动合并</strong>，合不合并由你决定。</span><span class="en">When the platform ships a new version, a bot opens a PR on your repo — the PR is the notification. It <strong>never auto-merges</strong>; merging is your call.</span></p>
       </div>
     </div>
-    <p style="margin-top:20px;font-size:.93rem;color:var(--muted)">
-      <span class="zh">另外一条规则贯穿始终：<strong>门禁做决定，AI 只提建议。</strong>PR 能否合并由确定性的自动检查（安装、测试、lint、安全扫描）说了算；AI 审查员只留评论，永远无权拦截你的 PR。</span>
-      <span class="en">One rule runs through everything: <strong>the gate decides, the AI only advises.</strong> Whether a PR can merge is determined by deterministic checks (install, tests, lint, security). The AI reviewer leaves comments only — it can never block you.</span>
+    <p class="note">
+      <span class="zh"><strong>门禁做决定，AI 只提建议。</strong>PR 能否合并由确定性的自动检查（安装、测试、lint、安全扫描）说了算；AI 审查员只留评论，永远无权拦截你的 PR。</span>
+      <span class="en"><strong>The gate decides, the AI only advises.</strong> Whether a PR can merge is determined by deterministic checks (install, tests, lint, security). The AI reviewer leaves comments only — it can never block you.</span>
     </p>
   </section>
 
-  <section id="trust">
+  <section id="trust" class="reveal">
+    <span class="kicker"><span class="zh">信任</span><span class="en">Trust</span></span>
     <h2><span class="zh">为什么可以信任它</span><span class="en">Why you can trust it</span></h2>
     <p class="sub">
       <span class="zh">这个平台是按「怀疑者优先」设计的。以下每一条都可以在公开代码里自己验证。</span>
@@ -177,48 +302,47 @@ flowchart LR
     </div>
   </section>
 
-  <section id="install">
+  <section id="install" class="reveal">
+    <span class="kicker"><span class="zh">透明</span><span class="en">Transparency</span></span>
     <h2><span class="zh">「下载仓库」？不 —— 你到底得到了什么</span><span class="en">"Download a repo"? No — here's what you actually get</span></h2>
     <p class="sub">
       <span class="zh">加入平台<strong>不是</strong>下载我们的代码库。<code>copier copy</code> 会为你<strong>生成一个全新的、属于你自己的仓库</strong> —— 十几个小文件，五分钟就能全部读完。以下就是全部内容：</span>
       <span class="en">Joining does <strong>not</strong> mean downloading our codebase. <code>copier copy</code> <strong>generates a brand-new repo that belongs to you</strong> — about a dozen small files you can read in full in five minutes. This is everything:</span>
     </p>
-    <pre><code>my-agent/
-├── agent.manifest.yaml       <span class="zh"># 你仓库的「说明卡」：怎么构建、怎么测试</span><span class="en"># your repo's index card: how to build & test</span>
-├── .copier-answers.yml       <span class="zh"># 记录模板版本，未来更新用</span><span class="en"># records the template version, for future updates</span>
-├── config.py                 <span class="zh"># 唯一的配置文件（端口 / 模型 / 环境变量）</span><span class="en"># the single config file (port / model / env vars)</span>
-├── pyproject.toml            <span class="zh"># Python 依赖（poetry）</span><span class="en"># Python dependencies (poetry)</span>
-├── railpack.json             <span class="zh"># 一键部署到 Railway 的启动配置</span><span class="en"># zero-config deploy to Railway</span>
-├── api/                      <span class="zh"># FastAPI 接口 —— 你的业务逻辑写在这里</span><span class="en"># FastAPI endpoints — your business logic goes here</span>
-├── mcp_server/               <span class="zh"># MCP 服务器 —— 让 AI 客户端连接你的 Agent</span><span class="en"># the MCP server — lets AI clients connect to your agent</span>
-├── tests/                    <span class="zh"># 起步测试</span><span class="en"># starter tests</span>
-├── scripts/                  <span class="zh"># 可选：注册进舰队的脚本</span><span class="en"># optional: the fleet-registration script</span>
-└── .github/workflows/
-    └── review.yml            <span class="zh"># 你的 CI：引用 policies@vN 跑审查门禁</span><span class="en"># your CI: references policies@vN to run the gate</span></code></pre>
-    <p style="font-size:.93rem;color:var(--muted)">
+    <pre><code><span class="dir">my-agent/</span>
+├── agent.manifest.yaml       <span class="cm zh"># 你仓库的「说明卡」：怎么构建、怎么测试</span><span class="cm en"># your repo's index card: how to build &amp; test</span>
+├── .copier-answers.yml       <span class="cm zh"># 记录模板版本，未来更新用</span><span class="cm en"># records the template version, for future updates</span>
+├── config.py                 <span class="cm zh"># 唯一的配置文件（端口 / 模型 / 环境变量）</span><span class="cm en"># the single config file (port / model / env vars)</span>
+├── pyproject.toml            <span class="cm zh"># Python 依赖（poetry）</span><span class="cm en"># Python dependencies (poetry)</span>
+├── railpack.json             <span class="cm zh"># 一键部署到 Railway 的启动配置</span><span class="cm en"># zero-config deploy to Railway</span>
+├── <span class="dir">api/</span>                      <span class="cm zh"># FastAPI 接口 —— 你的业务逻辑写在这里</span><span class="cm en"># FastAPI endpoints — your business logic goes here</span>
+├── <span class="dir">mcp_server/</span>               <span class="cm zh"># MCP 服务器 —— 让 AI 客户端连接你的 Agent</span><span class="cm en"># the MCP server — lets AI clients connect to your agent</span>
+├── <span class="dir">tests/</span>                    <span class="cm zh"># 起步测试</span><span class="cm en"># starter tests</span>
+├── <span class="dir">scripts/</span>                  <span class="cm zh"># 可选：注册进舰队的脚本</span><span class="cm en"># optional: the fleet-registration script</span>
+└── <span class="dir">.github/workflows/</span>
+    └── review.yml            <span class="cm zh"># 你的 CI：引用 policies@vN 跑审查门禁</span><span class="cm en"># your CI: references policies@vN to run the gate</span></code></pre>
+    <p class="tree-note">
       <span class="zh">没有安装器、没有后台进程、没有向外发送数据的代码。生成之后它就是一个普通的 Python 小项目，跑不跑、传不传 GitHub、部不部署，全由你决定。</span>
       <span class="en">No installer, no background process, no code that phones home. Once generated it's just a small ordinary Python project — whether you run it, push it, or deploy it is entirely up to you.</span>
     </p>
   </section>
 
-  <section id="try">
+  <section id="try" class="reveal">
+    <span class="kicker"><span class="zh">体验</span><span class="en">Demo</span></span>
     <h2><span class="zh">先试 30 秒 —— 什么都不用装</span><span class="en">Try it in 30 seconds — install nothing</span></h2>
     <p class="sub">
       <span class="zh">舰队里的 Agent 就是一个可连接的 MCP 服务。用 Claude Code 一条命令连上一个真实在线的成员 Agent，亲手调用它的工具：</span>
       <span class="en">A fleet agent is simply a connectable MCP service. With one Claude Code command, connect to a real, live member agent and call its tools yourself:</span>
     </p>
     <pre><button class="copy-btn" data-copy>copy</button><code>claude mcp add --transport http legion-demo https://my-agent3-production.up.railway.app/mcp</code></pre>
-    <p>
-      <span class="zh">然后在 Claude 里问一句「用 legion-demo 打个招呼」。没有 Claude Code？直接在浏览器打开它的 <a href="https://my-agent3-production.up.railway.app/docs">API 文档（Swagger）</a> 点几下试试 —— 这也是每个成员 Agent 自带的。</span>
-      <span class="en">Then ask Claude to "say hi using legion-demo". No Claude Code? Open the agent's <a href="https://my-agent3-production.up.railway.app/docs">API docs (Swagger)</a> in your browser and click around — every member agent ships this too.</span>
-    </p>
-    <p style="font-size:.93rem;color:var(--muted)">
-      <span class="zh">你刚刚体验到的，就是你自己的 Agent 部署后的样子：一个 <code>/mcp</code> 端点给 AI 客户端，一个 <code>/api</code> 给普通 HTTP 调用。</span>
-      <span class="en">What you just experienced is exactly what your own agent looks like once deployed: an <code>/mcp</code> endpoint for AI clients, plus <code>/api</code> for plain HTTP.</span>
+    <p style="font-size:.94rem;color:var(--muted)">
+      <span class="zh">然后在 Claude 里问一句「用 legion-demo 打个招呼」。没有 Claude Code？直接在浏览器打开它的 <a href="https://my-agent3-production.up.railway.app/docs">API 文档（Swagger）</a> 点几下试试 —— 这也是每个成员 Agent 自带的。你刚刚体验到的，就是你自己的 Agent 部署后的样子：<code>/mcp</code> 给 AI 客户端，<code>/api</code> 给普通 HTTP 调用。</span>
+      <span class="en">Then ask Claude to "say hi using legion-demo". No Claude Code? Open the agent's <a href="https://my-agent3-production.up.railway.app/docs">API docs (Swagger)</a> in your browser and click around — every member agent ships this too. What you just experienced is exactly what your own agent looks like once deployed: <code>/mcp</code> for AI clients, <code>/api</code> for plain HTTP.</span>
     </p>
   </section>
 
-  <section id="start">
+  <section id="start" class="reveal">
+    <span class="kicker"><span class="zh">上手</span><span class="en">Get started</span></span>
     <h2><span class="zh">快速开始</span><span class="en">Quickstart</span></h2>
     <p class="sub">
       <span class="zh">前置条件：Python 3.11+、<a href="https://copier.readthedocs.io">Copier</a>、<a href="https://python-poetry.org">Poetry</a>。</span>
@@ -227,13 +351,13 @@ flowchart LR
     <ol class="steps">
       <li>
         <strong><span class="zh">生成你自己的 Agent 仓库</span><span class="en">Generate your own agent repo</span></strong>
-        <pre><button class="copy-btn" data-copy>copy</button><code>copier copy gh:turingplanet/agent-template ./my-agent && cd my-agent</code></pre>
+        <pre><button class="copy-btn" data-copy>copy</button><code>copier copy gh:turingplanet/agent-template ./my-agent &amp;&amp; cd my-agent</code></pre>
         <span class="zh">回答几个问题（项目名默认取文件夹名；是否注册进舰队 —— 可以选否）。</span>
         <span class="en">Answer a few questions (project name defaults to the folder; fleet registration — feel free to say no).</span>
       </li>
       <li>
         <strong><span class="zh">本地跑起来，冒烟测试</span><span class="en">Run it locally, smoke-test</span></strong>
-        <pre><button class="copy-btn" data-copy>copy</button><code>poetry install && poetry run pytest</code></pre>
+        <pre><button class="copy-btn" data-copy>copy</button><code>poetry install &amp;&amp; poetry run pytest</code></pre>
         <span class="zh">让 Claude 直接连上本地的 MCP 服务器：</span>
         <span class="en">Connect Claude straight to the local MCP server:</span>
         <pre><button class="copy-btn" data-copy>copy</button><code>claude mcp add my-agent -- poetry -C "$(pwd)" run python "$(pwd)/mcp_server/server.py"</code></pre>
@@ -251,7 +375,8 @@ flowchart LR
     </ol>
   </section>
 
-  <section id="faq">
+  <section id="faq" class="reveal">
+    <span class="kicker">FAQ</span>
     <h2><span class="zh">常见问题</span><span class="en">Common questions</span></h2>
     <table>
       <tr>
@@ -282,18 +407,25 @@ flowchart LR
 <footer>
   <div class="wrap">
     <div class="links">
-      <a href="https://github.com/turingplanet/agent-legion"><span class="zh">架构文档</span><span class="en">Architecture docs</span> (agent-legion)</a>
-      <a href="https://github.com/turingplanet/agent-template"><span class="zh">启动模板</span><span class="en">Starter kit</span> (agent-template)</a>
-      <a href="https://github.com/turingplanet/policies"><span class="zh">规则与审查</span><span class="en">Rules & review</span> (policies)</a>
-      <a href="https://github.com/enochhz/hello-agent"><span class="zh">示例成员</span><span class="en">Worked example</span> (hello-agent)</a>
+      <a href="https://github.com/turingplanet/agent-legion"><span class="zh">架构文档</span><span class="en">Architecture docs</span> · agent-legion</a>
+      <a href="https://github.com/turingplanet/agent-template"><span class="zh">启动模板</span><span class="en">Starter kit</span> · agent-template</a>
+      <a href="https://github.com/turingplanet/policies"><span class="zh">规则与审查</span><span class="en">Rules &amp; review</span> · policies</a>
+      <a href="https://github.com/enochhz/hello-agent"><span class="zh">示例成员</span><span class="en">Worked example</span> · hello-agent</a>
     </div>
-    <div>图灵星球 Agent 军团 · Agent Legion — <span class="zh">所有轨道代码公开可审计。</span><span class="en">All rails code is public and auditable.</span></div>
+    <div>🛰️ 图灵星球 Agent 军团 · Agent Legion — <span class="zh">所有轨道代码公开可审计。</span><span class="en">All rails code is public and auditable.</span></div>
   </div>
 </footer>
 
 <script type="module">
   import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-  mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+  mermaid.initialize({
+    startOnLoad: true, securityLevel: "loose", theme: "dark",
+    themeVariables: {
+      background: "#11151f", primaryColor: "#151a26", primaryBorderColor: "#2a3242",
+      primaryTextColor: "#e8ebf2", lineColor: "#6b7487", clusterBkg: "#0e1219",
+      clusterBorder: "#1e2532", edgeLabelBackground: "#0e1219", fontFamily: "Inter, Noto Sans SC, sans-serif"
+    }
+  });
 </script>
 <script>
   const btn = document.getElementById("langToggle");
@@ -314,6 +446,11 @@ flowchart LR
       setTimeout(() => (b.textContent = "copy"), 1200);
     });
   });
+
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  }), { threshold: 0.08 });
+  document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
 </script>
 </body>
 </html>
