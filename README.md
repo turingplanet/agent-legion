@@ -152,7 +152,7 @@ flowchart LR
 
 **If `agent-template` changes** (the starter files — the **COPY** side): the migration bot runs `copier update` on your repo and opens a PR with the new template files merged in — your `/api` + `/mcp` code is preserved. Or run `copier update` yourself.
 
-**Either way:** nothing merges without you, and every update PR passes through your gate first. (The bot lives in [agent-registry](https://github.com/turingplanet/agent-registry) and reads the fleet list there.)
+**Either way:** nothing merges without you, and every update PR passes through your gate first. And if you've pushed manual fixes to a sync branch (say, resolving conflict markers), the bot **never overwrites them** — each new template version arrives on its own fresh branch. (The bot lives in [agent-registry](https://github.com/turingplanet/agent-registry) and reads the fleet list there.)
 
 ## Common questions
 
@@ -188,4 +188,7 @@ flowchart LR
 
 ## Status
 
-Architecture 1 (build → review → gate) works end-to-end today: a PR runs the full flow and the gate decides. Architecture 2 (release / deploy) and Architecture 3 (the MCP gateway) are next.
+- **Architecture 1 (build → review → gate): live.** A PR runs the full flow and the gate decides.
+- **Architecture 2 (release / deploy) v1: live.** Platform-hosted deployment is config-driven: an approved entry in [agent-registry](https://github.com/turingplanet/agent-registry)'s `deployments.yaml` deploys the member to the platform's Railway project and serves it at **`<slug>.agents.turingplanet.ai`** (TLS included, zero DNS work per agent). Removing the entry is the kill switch. Members can equally self-host on their own Railway — platform hosting is optional and admin-approved.
+- **Architecture 3 (the MCP gateway): seeded.** The fleet edge router that powers the platform subdomains is its first incarnation.
+- **Next up:** the migration path for existing projects — design in [RFC 001](rfcs/001-migration-and-deploy.md).
