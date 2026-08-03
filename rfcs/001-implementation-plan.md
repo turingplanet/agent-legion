@@ -87,7 +87,7 @@ Railway requires a **per-subdomain TXT verification record** and assigns a **uni
 **Revised design — one wildcard domain, one edge router:** attach the single wildcard custom domain `*.agents.turingplanet.ai` to **one router service** in the `agent-fleet` project; the router forwards by hostname to member services over Railway **private networking** (`<slug>.railway.internal`). One DNS setup, one TXT, one domain slot, unlimited subdomains — and the router is the seed of Architecture 3's MetaMCP gateway. The deploy workflow then never touches DNS: deploy member service → update the router's routing table.
 
 - [x] **Separate Railway project** for fleet hosting: `agent-fleet` (created 2026-08-02, empty).
-- [ ] Clean up the experiment: delete `test.agents.turingplanet.ai` from legion-demo (frees a domain slot) + remove its CNAME/TXT records in Namecheap.
+- [x] Clean up the experiment: `test.agents.turingplanet.ai` deleted from legion-demo + Namecheap records removed (verified via DNS, 2026-08-02). `FLEET_RAILWAY_TOKEN` (workspace-scoped) stored as an agent-registry secret and validated against the GraphQL API.
 - [ ] Router service in `agent-fleet` (Caddy or a small FastAPI/uvicorn proxy, scaffolded from our own template): hostname → `<slug>.railway.internal` routing table from a config file.
 - [ ] One-time DNS: wildcard `*.agents.turingplanet.ai` CNAME to the router's Railway target + its single TXT verification.
 - [ ] `deployments.yaml` schema (`host: platform | dns-only`, slug, limits) in agent-registry.
