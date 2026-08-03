@@ -102,15 +102,15 @@ Railway requires a **per-subdomain TXT verification record** and assigns a **uni
 
 - [x] **Separate Railway project** for fleet hosting: `agent-fleet` (created 2026-08-02, empty).
 - [x] Clean up the experiment: `test.agents.turingplanet.ai` deleted from legion-demo + Namecheap records removed (verified via DNS, 2026-08-02). `FLEET_RAILWAY_TOKEN` (workspace-scoped) stored as an agent-registry secret and validated against the GraphQL API.
-- [ ] Router service in `agent-fleet` (Caddy or a small FastAPI/uvicorn proxy, scaffolded from our own template): hostname → `<slug>.railway.internal` routing table from a config file.
-- [ ] One-time DNS: wildcard `*.agents.turingplanet.ai` CNAME to the router's Railway target + its single TXT verification.
+- [x] Router service live: `fleet-router` (Caddy, repo enochhz/fleet-router) in agent-fleet; Caddyfile = routing table. Gotcha captured: member services must bind IPv6 (`HOST=::`) for private networking.
+- [x] One-time DNS done — even better than designed: wildcard CNAME + `_acme-challenge.agents` ACME-delegation CNAME (NO per-domain TXT ever; wildcard TLS auto-issued). Zero DNS in the deploy loop, permanently.
 - [ ] `deployments.yaml` schema (`host: platform | dns-only`, slug, limits) in agent-registry.
 - [ ] Deploy workflow (dispatch + cron): per approved entry → checkout member main at a **gate-green commit** (commit status API) → `railway up` into agent-fleet → add slug to the router table. Entry removed → undeploy + route removed (kill switch).
 - [ ] `dns-only` mode: explicit CNAME record to the member's own Railway (per-domain TXT applies — acceptable at dns-only volumes).
-- [ ] Pilot: platform-host `hello-agent` end to end at `hello.agents.turingplanet.ai`.
+- [x] Pilot LIVE (2026-08-03): `hello-fleet` (scaffolded v0.0.18, repo enochhz/hello-fleet) at https://hello-fleet.agents.turingplanet.ai — /api + /mcp verified end to end; MCP round-trip through the router 0.63s; unknown-subdomain 404 works. All via GraphQL API (serviceCreate, variableUpsert, customDomainCreate) — the deploy workflow's dress rehearsal.
 
 **Done when:** one member is live on a platform subdomain via the workflow, and deleting its entry takes it down.
-**Open item:** router adds a hop — measure MCP streaming latency through it during the pilot; upgrade plan + per-agent domains remains the fallback if proxying MCP proves problematic.
+**Resolved:** MCP streaming through the router measured at 0.63s full round-trip (TLS+init+call) — proxying is a non-issue. Remaining M5 work: `deployments.yaml` + the workflow that codifies the API calls above (incl. Caddyfile generation + router redeploy).
 
 ## M6 — Fast-follows (build only on demand)
 
