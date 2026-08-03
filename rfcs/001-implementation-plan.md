@@ -81,13 +81,22 @@ Implements RFC §10 v1. **Recommendation: a dedicated tiny `registrar` service, 
 
 Implements RFC §5. Independent of M3/M4.
 
-- [ ] One-time: wildcard `*.agents.turingplanet.ai` CNAME in Namecheap; **separate Railway project** for fleet hosting (isolation from tech-squad-api).
-- [ ] `deployments.yaml` schema (`host: platform | dns-only`, domain, limits) in agent-registry.
-- [ ] Deploy workflow (dispatch + cron): per approved entry → checkout member main at a **gate-green commit** (commit status API) → Railway API deploy → attach `slug.agents.turingplanet.ai`. Entry removed → undeploy (kill switch).
-- [ ] `dns-only` mode: CNAME record only, no hosting.
-- [ ] Pilot: platform-host `hello-agent` end to end.
+**Domain experiment results (2026-08-02, live test with `test.agents.turingplanet.ai` on legion-demo):**
+Railway requires a **per-subdomain TXT verification record** and assigns a **unique CNAME target per domain** — so per-agent custom domains would force Namecheap-API automation into the workflow. Worse, the account's **custom-domain plan limit was hit at ~3 domains**. Per-agent domains do not scale.
+
+**Revised design — one wildcard domain, one edge router:** attach the single wildcard custom domain `*.agents.turingplanet.ai` to **one router service** in the `agent-fleet` project; the router forwards by hostname to member services over Railway **private networking** (`<slug>.railway.internal`). One DNS setup, one TXT, one domain slot, unlimited subdomains — and the router is the seed of Architecture 3's MetaMCP gateway. The deploy workflow then never touches DNS: deploy member service → update the router's routing table.
+
+- [x] **Separate Railway project** for fleet hosting: `agent-fleet` (created 2026-08-02, empty).
+- [ ] Clean up the experiment: delete `test.agents.turingplanet.ai` from legion-demo (frees a domain slot) + remove its CNAME/TXT records in Namecheap.
+- [ ] Router service in `agent-fleet` (Caddy or a small FastAPI/uvicorn proxy, scaffolded from our own template): hostname → `<slug>.railway.internal` routing table from a config file.
+- [ ] One-time DNS: wildcard `*.agents.turingplanet.ai` CNAME to the router's Railway target + its single TXT verification.
+- [ ] `deployments.yaml` schema (`host: platform | dns-only`, slug, limits) in agent-registry.
+- [ ] Deploy workflow (dispatch + cron): per approved entry → checkout member main at a **gate-green commit** (commit status API) → `railway up` into agent-fleet → add slug to the router table. Entry removed → undeploy + route removed (kill switch).
+- [ ] `dns-only` mode: explicit CNAME record to the member's own Railway (per-domain TXT applies — acceptable at dns-only volumes).
+- [ ] Pilot: platform-host `hello-agent` end to end at `hello.agents.turingplanet.ai`.
 
 **Done when:** one member is live on a platform subdomain via the workflow, and deleting its entry takes it down.
+**Open item:** router adds a hop — measure MCP streaming latency through it during the pilot; upgrade plan + per-agent domains remains the fallback if proxying MCP proves problematic.
 
 ## M6 — Fast-follows (build only on demand)
 
