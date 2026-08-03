@@ -27,9 +27,9 @@ M3/M4/M5 are parallel after M2 — pick by appetite. Dotted = only on demand.
 Pending items that interact badly with any new release:
 
 - [x] **Merge the two v0.0.9 sync PRs** (DONE 2026-08-03 — hello-agent#8 needed full re-resolution after a July bot force-push destroyed the hand-resolution; both members now on v0.0.17): [test-agent-2#2](https://github.com/turingplanet/test-agent-2/pull/2), [hello-agent#8](https://github.com/enochhz/hello-agent/pull/8). ⚠️ A bot run before these merge force-pushes `chore/template-sync` and destroys hello-agent#8's hand-resolution (bot cron: **Mondays 06:00 UTC** — check the calendar before starting).
-- [ ] **Grant fleet App access on `enochhz`** (Settings → Applications → fleet-migration-bot → All repositories). Without it, syncs on my-agent/my-agent3 keep failing `Not Found`.
+- [x] **Grant fleet App access on `enochhz`** (All repositories; done 2026-08-03 — the earlier my-agent/my-agent3 failures were deleted repos, since deregistered) (Settings → Applications → fleet-migration-bot → All repositories). Without it, syncs on my-agent/my-agent3 keep failing `Not Found`.
 - [ ] **Delete the accidental `sparkling-ambition` Railway project** (staged Redis/Postgres/bucket — possible billing).
-- [ ] Register `legion-demo` in `members.yaml` (it's the flagship; it should be a fleet member).
+- [x] Register `legion-demo` in `members.yaml` (+ org-side App grant) (it's the flagship; it should be a fleet member).
 
 **Done when:** both PRs merged · a manual bot run goes green across all members · Railway shows no stray project.
 
@@ -38,7 +38,7 @@ Pending items that interact badly with any new release:
 Ship the deploy fix **alone and immediately** — every new scaffold currently crashes on Railway (Railpack's mise poetry 2.4.1 is missing `libexpat.so.1`). Separating it from feature work means the fix reaches members this week, not when migration lands.
 
 - [x] `railpack.json` startCommand → `python mcp_server/server.py` (fix proven live on legion-demo).
-- [x] Tagged `v0.0.18` (2026-08-03). Bot run PENDING — cron disabled until the M1.5 bot fixes below land.
+- [x] Tagged `v0.0.18` (2026-08-03). Fleet-wide bot run green: all 5 members have gate-green v0.0.18 PRs.
 
 **Done when:** a fresh scaffold deploys green on Railway · fleet PRs merged.
 
@@ -49,12 +49,12 @@ The July cron force-pushed over a hand-resolved sync branch, shipped a stale
 Jul 20 + 27. Cron is now **disabled** until these land in
 `agent-registry/.github/workflows/migrate-fleet.yml`:
 
-- [ ] **Never overwrite human work**: skip + PR-comment when the sync branch has non-bot commits.
-- [ ] **Version-scoped branches**: `chore/template-sync-vX.Y.Z` — new version = new branch/PR; same-version re-runs are idempotent.
-- [ ] **Skip when already current** (read `.copier-answers.yml` on the branch).
-- [ ] **Run `poetry lock` after `copier update`** (install poetry in the runner).
-- [ ] **Fail loudly**: open/update an issue on failure.
-- [ ] Re-enable cron + one supervised run → fleet to v0.0.18.
+- [x] **Never overwrite human work**: skip + PR-comment when the sync branch has non-bot commits.
+- [x] **Version-scoped branches**: `chore/template-sync-vX.Y.Z` — new version = new branch/PR; same-version re-runs are idempotent.
+- [x] **Skip when already current** (read `.copier-answers.yml` on the branch).
+- [x] **Run `poetry lock` after `copier update`** (install poetry in the runner).
+- [x] **Fail loudly**: open/update an issue on failure.
+- [x] Re-enable cron + one supervised run → fleet to v0.0.18.
 
 ## M2 — agent-template v0.0.19: migration features (2–3 sessions) — *the core*
 
