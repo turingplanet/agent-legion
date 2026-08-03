@@ -132,15 +132,70 @@ Every default is the self-sovereign option; every platform option is granted by 
 
 ## 8. Components to build, in order
 
-1. **agent-template v0.0.18** — `adopt_mode` (conditional generation) · destination/AI-assist copier questions · `detect.sh` · `MIGRATE.md` · the pending `railpack.json` startCommand fix (Railpack's poetry runtime broke; legion-demo carries the fix, the template doesn't yet).
+1. **agent-template v0.0.18** — `adopt_mode` (conditional generation) · destination/AI-assist copier questions · `detect.sh` · `MIGRATE.md` · `fleet.register` manifest field + `register.yml` push-workflow (§10; the `github_repo` copier question is deleted) · the pending `railpack.json` startCommand fix (Railpack's poetry runtime broke; legion-demo carries the fix, the template doesn't yet).
 2. **`setup.sh`** hosted on the site (bootstrap + detect).
-3. **agent-registry: `deployments.yaml` + deploy workflow** (Railway API, wildcard domain attach, cron + dispatch). *First registry change in this design.*
-4. **Platform advisor** MCP tool on a platform-hosted agent — only if members actually ask for platform-paid assist; it has ongoing cost + abuse surface.
-5. **Nothing in policies.**
+3. **Registrar endpoint** on a platform-hosted service (§10) — receives `{repo}` from member CI, opens the members.yaml PR platform-side. First version can piggyback on legion-demo's FastAPI.
+4. **agent-registry: `deployments.yaml` + deploy workflow** (Railway API, wildcard domain attach, cron + dispatch). *First registry change in this design.*
+5. **Platform advisor** MCP tool on a platform-hosted agent — only if members actually ask for platform-paid assist; it has ongoing cost + abuse surface.
+6. **Nothing in policies.**
 
-## 9. Open questions
+## 9. Registry control plane — one release, N update PRs
+
+How the registry keeps every registered repo current: membership is **declared, never discovered** (`members.yaml` is the single roster; entries arrive only as admin-merged PRs — see §10 for how they get opened). When the platform ships a template or policies release, one bot run fans out to the whole fleet:
+
+```mermaid
+flowchart TB
+    REL["Platform ships a release<br/>agent-template vN+1 — or policies vN+1"] --> RUN["Bot run — agent-registry CI<br/>cron Mon 06:00 UTC · or manual dispatch"]
+    RUN --> ROSTER["Read members.yaml — the roster"]
+    ROSTER --> M1["mint App token for alice<br/>copier update → PR on alice/agent-a"]
+    ROSTER --> M2["mint App token for bob<br/>copier update → PR on bob/agent-b"]
+    ROSTER --> M3["… one PR per registered repo"]
+    M1 --> G1["alice's own gate runs<br/>her pinned policies@vN"]
+    M2 --> G2["bob's own gate runs"]
+    G1 --> A1["alice reviews + merges — or ignores"]
+    G2 --> A2["bob reviews + merges — or ignores"]
+```
+
+Properties of the control plane:
+
+- **One release → one bot run → N PRs.** The bot mints a short-lived GitHub App installation token *per member account* at runtime; no long-lived credentials exist.
+- **Never auto-merges.** Every PR passes through that member's own pinned gate; merging (or ignoring) is the member's call. A member on `policies@v5` stays on v5 until *they* merge the bump.
+- **Two layers, both required:** `members.yaml` = the roster (knowledge) · fleet App installation on the repo = the keys (access). A registered repo without App access is skipped — this is a live failure mode today and the motivation for §10's v2.
+- **`deployments.yaml` (§5) rides the same plane:** platform-hosted members get redeployed from gate-green main after they merge — same roster model, same admin-merge authorization, same kill-switch-by-diff.
+
+## 10. Deferred auto-registration
+
+Today registration fires at scaffold time and asks for the GitHub repo name **before the repo exists** (the script guesses the owner via `gh api user`). This section defers execution to the moment a real repo appears — while keeping consent explicit.
+
+**Design:**
+
+- **The copier question stays, as an explicit yes/no** — registration is always a conscious choice at scaffold, never a silent default. The answer is recorded in `agent.manifest.yaml` as `fleet: { register: true | false }` — visible and auditable in the member's own repo (the manifest is the seam every tool reads). Flip it anytime; the next push acts on the new value.
+- **Local scaffold does nothing.** No repo, no registration activity, nothing to worry about.
+- **First push executes the intent.** A small `register.yml` workflow (`on: push` to main) reads the flag; the repo address needs no detection at all — `github.repository` is `owner/name`, CI knows where it's running.
+- **The write happens platform-side.** Member CI cannot open PRs on the (private) registry — the default `GITHUB_TOKEN` is repo-scoped, and secrets never cross accounts. So member CI sends only public metadata (`{repo}`) to a **registrar endpoint** on a platform-hosted service, which validates the repo's manifest actually says `register: true`, then opens the members.yaml PR itself with platform credentials that never leave home. Idempotent (checks roster + open PRs), rate-limited, and **inert until the admin merges** — spam costs a PR-close click, never a fleet entry.
+- `register-in-fleet.sh` survives only as a manual fallback.
+
+```mermaid
+flowchart TB
+    Q["Scaffold — copier asks explicitly:<br/>register this agent in the fleet? yes / no"] --> F["Answer recorded in agent.manifest.yaml<br/>fleet.register: true | false"]
+    F --> LOCAL["Local development<br/>no repo yet — nothing fires"]
+    LOCAL --> PUSH["First push to GitHub<br/>register.yml reads the flag +<br/>github.repository (auto-detected)"]
+    PUSH -- "fleet.register: false" --> OFF["No-op<br/>flip the flag later → next push registers"]
+    PUSH -- "fleet.register: true" --> REG["Registrar — platform-side service<br/>validates manifest · idempotent · rate-limited"]
+    REG --> PR["Opens PR on agent-registry<br/>adding repo to members.yaml"]
+    PR --> ADM{"Admin merges?"}
+    ADM -- "no" --> OUT["Closed — not in fleet"]
+    ADM -- "yes" --> IN["Registered — on the roster"]
+    IN --> APP["Member grants fleet App access<br/>one browser click — the keys"]
+    APP --> DONE["Fully synced member<br/>bot update PRs now reach this repo"]
+```
+
+**v2 — collapse the last two steps:** GitHub Apps emit an `installation` webhook when added to a repo. "Register" could simply *be* "install the fleet App": one browser click grants access **and** signals intent; the webhook hits the registrar, which checks the manifest flag and opens the PR. Roster and keys in one action — the §9 skipped-member failure mode disappears. Needs an always-on webhook receiver, so it's a fast-follow, not v1.
+
+## 11. Open questions
 
 - Extract path: auto-create the new GitHub repo (`gh` magic) or generate locally and let the member push? **Recommendation: manual push for v1** — consistent with "you own every outward action."
 - Non-Python: when demand appears, sibling `agent-template-<lang>` sharing the same manifest schema — never stretch the Python template.
-- Platform-lane instant CD via App webhooks — v2.
+- Platform-lane instant CD + App-install-as-registration (§10 v2) share the same webhook receiver — build once, serve both.
 - Advisor privacy wording ("code sent to us, not stored") — needs exact copy before launch.
+- Registrar spam posture: is PR-close-on-junk enough, or should the endpoint require the caller to prove repo control (e.g. a challenge file)? v1 ships simple; revisit if abused.
