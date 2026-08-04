@@ -77,6 +77,17 @@ Only (3) pushes to your repo — and only as a PR you merge.
 
 **Only ③ ever _pushes_ to your repo — and only as a PR you merge.** ① is a one-time pull you start; ② is your CI reaching *out* to policies — policies never reaches *in*.
 
+### The platform's own running services
+
+The four repos above are **files**. Two more are **services the platform runs** — you never install them, but they're public so you can read exactly what they do:
+
+| repo | what it does | when it touches you |
+| --- | --- | --- |
+| [fleet-router](https://github.com/turingplanet/fleet-router) | the edge router: one wildcard domain (`*.agents.turingplanet.ai`) whose Caddy routing table is generated from `agent-registry/deployments.yaml` | only if you opt into platform hosting — it's what serves `<your-slug>.agents.turingplanet.ai` |
+| [fleet-services](https://github.com/turingplanet/fleet-services) | holds the platform's credentials (LLM key, GitHub App) so member CI never has to: runs `/review` (§7) and, soon, auto-registration | only when you ask — e.g. commenting `/review` on your PR |
+
+Both follow the same rule as everything else: **they act with the platform's own credentials on the platform's own side**, and member repos only ever send public metadata (repo name, PR number). Nothing of yours is stored.
+
 ## 2. The two ways things connect: COPY vs REFERENCE
 
 This is the one idea that makes everything else click. Repos connect to the shared ones in **two different ways**:
@@ -216,6 +227,8 @@ Each repo gets a weekly allowance (`ai_review.weekly_limit` in `members.yaml`, s
 - **Want the starter kit?** → [agent-template](https://github.com/turingplanet/agent-template)
 - **Want a worked example?** → [hello-agent](https://github.com/enochhz/hello-agent)
 - **The fleet inventory + auto-migration bot?** → [agent-registry](https://github.com/turingplanet/agent-registry)
+- **What runs `/review` (and holds the platform's keys)?** → [fleet-services](https://github.com/turingplanet/fleet-services)
+- **What serves `*.agents.turingplanet.ai`?** → [fleet-router](https://github.com/turingplanet/fleet-router)
 
 ## Status
 
