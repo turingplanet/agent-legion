@@ -1,7 +1,7 @@
 # RFC 002 — Platform-paid on-demand AI security review
 
 **Status:** draft for discussion · **Date:** 2026-08-03
-**One-liner:** a member comments `/security-review` on their PR; the platform's own Claude reviews the diff for security issues and replies as a PR comment — platform-funded, quota-controlled by the registry, advisory only.
+**One-liner:** a member comments `/review [security|perf|general]` on their PR; the platform's own Claude reviews the diff and replies as a PR comment — platform-funded, quota-controlled by the registry, advisory only. Security is the flagship type and the default.
 
 ## 1. Problem
 
@@ -18,7 +18,7 @@ The existing AI reviewer in the gate is **member-key-funded** (`ANTHROPIC_API_KE
 
 ```mermaid
 flowchart TB
-    C["Member comments '/security-review' on their own PR"] --> W["platform-review.yml — template-shipped,<br/>runs in MEMBER CI, sends public metadata only"]
+    C["Member comments '/review [type]' on their own PR<br/>types: security (default) · perf · general"] --> W["platform-review.yml — template-shipped,<br/>runs in MEMBER CI, sends public metadata only"]
     W --> E["Reviewer service (platform-side)<br/>POST /api/review {repo, pr, comment_id}"]
     E --> V{"Entitled?"}
     V -- "not a member · quota spent ·<br/>commenter lacks write access · diff too large" --> NO["Polite decline comment on the PR<br/>(reason + when quota resets)"]
@@ -30,17 +30,17 @@ flowchart TB
 ## 4. Components
 
 ### 4.1 Trigger — `platform-review.yml` (template, ~15 lines)
-`on: issue_comment (created)`; proceeds only when the comment is on a PR and starts with `/security-review`; POSTs `{repo, pr_number, comment_id}` to the reviewer endpoint; **exits 0 quietly if the endpoint doesn't exist yet** (ships before the service, same forward-compat pattern as `register.yml`). v2: retire it — the M6 webhook receiver subscribes the fleet App to comment events, so the trigger needs nothing in member repos at all.
+`on: issue_comment (created)`; proceeds only when the comment is on a PR and starts with `/review`; POSTs `{repo, pr_number, comment_id}` to the reviewer endpoint — the **review type is parsed server-side** from the comment body, so adding new types later (docs, tests, …) is a service-only change with no template release; **exits 0 quietly if the endpoint doesn't exist yet** (ships before the service, same forward-compat pattern as `register.yml`). v2: retire it — the M6 webhook receiver subscribes the fleet App to comment events, so the trigger needs nothing in member repos at all.
 
 ### 4.2 Reviewer service (platform-side; shares a home with the M4 registrar)
 Both endpoints hold privileged credentials and follow "receive public metadata → act platform-side" — build them as **one small platform service** (dedicated, not on legion-demo, per the registrar blast-radius decision). Validation order for `/api/review`:
 
 1. `repo` is in `members.yaml` (registry = who's entitled at all).
-2. `comment_id` really exists on that PR, body starts with `/security-review`, and the author's `author_association` is OWNER/MEMBER/COLLABORATOR — closes the "curl the endpoint to burn someone's quota" hole.
+2. `comment_id` really exists on that PR, body starts with `/review` (type parsed from the remainder; unknown type → decline listing valid types), and the author's `author_association` is OWNER/MEMBER/COLLABORATOR — closes the "curl the endpoint to burn someone's quota" hole.
 3. Quota: count marked comments in that repo over the trailing 7 days < `weekly_limit` (member-specific or platform default). Also enforce a **global weekly cap** across the fleet (platform budget backstop) — same search, unscoped.
 4. Diff size cap (e.g. ≤ 3,000 changed lines) — oversized PRs get a "narrow it down" decline rather than a truncated bad review.
 
-Then: fetch the diff via a fleet App installation token → one Claude call (pinned model + max-tokens; security-focused prompt) → post the review comment via the App with the hidden marker → done. Declines are also comments, stating the reason and when the quota resets — silent failure is banned (design-qa).
+Then: fetch the diff via a fleet App installation token → one Claude call (**top-tier Claude, pinned in service config** — quality over cost per the 2026-08-03 decision; quota is the cost lever) with the type's prompt (security/perf/general personas) → post the review comment via the App with the hidden marker → done. Declines are also comments, stating the reason — and a quota-exhausted decline includes the governance path: *"to raise your limit, open a PR bumping `ai_review.weekly_limit` for your repo in members.yaml"* — the limit doubles as a governance touchpoint. Silent failure is banned (design-qa).
 
 ### 4.3 Quota config — `members.yaml` extension
 
@@ -57,7 +57,7 @@ Platform default (proposed: 2/week) applies when the key is absent but the featu
 
 - **Reviewed code is untrusted input.** The prompt must treat the diff strictly as data to analyze; instructions inside the diff are findings ("this code attempts prompt injection"), never commands. Advisory-only design bounds the blast radius: worst case is a bad comment.
 - **Privacy disclosure** (same as the migration advisor, RFC 001): the command's response footer states "your diff was sent to the platform's LLM for this review; not retained."
-- **Cost levers**, cheapest first: per-repo quota → global cap → diff cap → model pin. All four ship in v1.
+- **Cost levers**, cheapest first: per-repo quota → global cap → diff cap. Model is deliberately NOT a cost lever (top tier, pinned): a review program is only as trusted as its worst review, so quality is fixed and volume is the dial. Quota counts ALL review types against one `weekly_limit`.
 - The platform's key never appears in any member-visible surface; App tokens are minted per-request and expire.
 
 ## 6. Relationship to the existing gate AI reviewer
@@ -66,7 +66,7 @@ Two tiers of the same principle:
 
 | | Gate reviewer (exists) | Platform reviewer (this RFC) |
 |---|---|---|
-| Runs | every PR automatically | on demand (`/security-review`) |
+| Runs | every PR automatically | on demand (`/review [type]`) |
 | Pays | member (their key; skipped if none) | platform |
 | Cost control | member's own | registry quota + global cap |
 | Blocking | never | never |
@@ -81,9 +81,9 @@ Members with their own key keep automatic reviews; everyone gets the on-demand p
 4. **Registry**: `ai_review` schema note in members.yaml comments; set pilot quotas.
 5. **Verify**: comment on a test PR → review arrives; burn the quota → decline arrives; curl the endpoint raw → rejected.
 
-## 8. Open questions
+## 8. Decisions (settled 2026-08-03)
 
-- Command surface: just `/security-review`, or a family (`/review`, `/review security|perf|general`)? v1: single command, security-focused — broaden on demand.
-- Model: pin the cheaper tier for cost, or the top tier for quality? Proposed: mid-tier pinned, revisit with real usage.
-- Should quota-exhausted members see "ask an admin to raise your limit" (PR to members.yaml) in the decline? Proposed: yes — it turns a limit into a governance touchpoint.
-- Once the M6 webhook receiver exists, does the member-side trigger workflow retire immediately or stay as fallback? Proposed: retire (one less file in the template).
+1. **Command family, not a single command:** `/review [security|perf|general]`, bare `/review` = `security` (the flagship). Types are parsed and prompted server-side, so future types cost no template release.
+2. **Top-tier Claude, pinned.** Quality over cost — trust in the review program is worth more than the per-call delta; quota is the cost dial.
+3. **Quota-exhausted declines teach governance:** the decline names the exact fix — a PR bumping `ai_review.weekly_limit` in members.yaml — turning the limit into a governance touchpoint.
+4. **The member-side trigger workflow retires when the M6 webhook receiver lands** — one less file in the template; the App's comment webhook takes over.
