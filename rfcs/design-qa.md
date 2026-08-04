@@ -45,7 +45,7 @@ Yes — live since 2026-08-03: `deployments.yaml` is the interface; merging an e
 Don't — they're one-time by design (2 CNAMEs: wildcard + ACME delegation; no per-domain TXT ever). Namecheap's API is a footgun (`setHosts` replaces the whole zone; IP whitelisting). If DNS-as-code ever truly matters: migrate the zone to Cloudflare. The architecture already achieved "zero DNS per agent" — that's the automation that counts.
 
 **Q: Whatever lands in a member repo auto-deploys?**
-Pushes to **main** only, and only once Railway's GitHub App can see the repo (it cannot see repos created after its install — grant "All repositories" on the account, or rebuilds must be triggered by API with a pinned SHA, as deploy-fleet does for the router).
+Pushes to **main** only, and only if the service has a **deployment trigger**. Gotcha (cost us a day of misdiagnosis): `serviceCreate(source:{repo})` sets the source but creates **no trigger**, so API-created services have silently dead CD — it is *not* a GitHub App permission problem. Fix: `deploymentTriggerCreate(provider:"github", repository, branch:"main", checkSuites:true)`; deploy-fleet.py now does this for every new service.
 
 ## Platform AI review (RFC 002)
 
