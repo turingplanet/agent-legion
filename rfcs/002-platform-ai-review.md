@@ -1,6 +1,6 @@
 # RFC 002 — Platform-paid on-demand AI security review
 
-**Status:** draft for discussion · **Date:** 2026-08-03
+**Status:** ✅ IMPLEMENTED + piloted live 2026-08-04 · **Date:** 2026-08-03
 **One-liner:** a member comments `/review [security|perf|general]` on their PR; the platform's own Claude reviews the diff and replies as a PR comment — platform-funded, quota-controlled by the registry, advisory only. Security is the flagship type and the default.
 
 ## 1. Problem
@@ -73,13 +73,22 @@ Two tiers of the same principle:
 
 Members with their own key keep automatic reviews; everyone gets the on-demand platform tier. Same advisory posture, so the community learns one rule: *AI comments, checks decide.*
 
+## 6.5 Implementation notes (2026-08-04)
+
+Live in **`fleet-services`** (enochhz/fleet-services, scaffolded from our own template, deployed via `deployments.yaml` — dogfooding M5) at `fleet-services.agents.turingplanet.ai`.
+
+- **Pilot verified:** a PR with three planted flaws (shell injection, hardcoded secret, path traversal) got `/review security` → all three caught with locations, exploitability, and fixes; quota footer read `1/5`. See enochhz/hello-fleet#1.
+- **Gotcha (cost us the first attempt):** the fleet App needed access to **agent-registry** itself (the service reads members.yaml through it) — roster-vs-keys again.
+- **Bug found by the pilot, fixed:** failures *before* the decline path had a token posted nothing to the PR. `handle_review` now wraps everything and always answers the member.
+- Secrets on the service: `ANTHROPIC_API_KEY`, `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`; `MODEL` pinned in Railway vars (env override of `config.py`).
+
 ## 7. Build plan (~1.5 sessions)
 
-1. **Platform service** (FastAPI, scaffolded from own template; Railway in agent-fleet; secrets: `ANTHROPIC_API_KEY`, fleet App creds): `/api/review` with the checks above. *(The M4 registrar's `/api/register` joins it later.)*
-2. **App grant** (config): fleet App → turingplanet installation → add `agent-registry`.
-3. **Template**: `platform-review.yml` (bundle into v0.0.19 with the M2 features — one release, one fleet sync).
-4. **Registry**: `ai_review` schema note in members.yaml comments; set pilot quotas.
-5. **Verify**: comment on a test PR → review arrives; burn the quota → decline arrives; curl the endpoint raw → rejected.
+1. ✅ **Platform service** (FastAPI, scaffolded from own template; Railway in agent-fleet; secrets: `ANTHROPIC_API_KEY`, fleet App creds): `/api/review` with the checks above. *(The M4 registrar's `/api/register` joins it later.)*
+2. ✅ **App grant** (config): fleet App → turingplanet installation → add `agent-registry`.
+3. **Template**: `platform-review.yml` — piloted by hand on hello-fleet; still TO DO in the template (bundle into v0.0.19 with the M2 features — one release, one fleet sync).
+4. ✅ **Registry**: `ai_review` schema note in members.yaml comments; set pilot quotas.
+5. ✅ **Verify** (partially — quota-exhaustion + raw-curl rejection still untested): comment on a test PR → review arrives; burn the quota → decline arrives; curl the endpoint raw → rejected.
 
 ## 8. Decisions (settled 2026-08-03)
 
