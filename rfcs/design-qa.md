@@ -47,6 +47,17 @@ Don't — they're one-time by design (2 CNAMEs: wildcard + ACME delegation; no p
 **Q: Whatever lands in a member repo auto-deploys?**
 Pushes to **main** only, and only once Railway's GitHub App can see the repo (it cannot see repos created after its install — grant "All repositories" on the account, or rebuilds must be triggered by API with a pinned SHA, as deploy-fleet does for the router).
 
+## Platform AI review (RFC 002)
+
+**Q: Why doesn't `/review` show up in GitHub's slash-command autocomplete?**
+It can't — that menu is GitHub's own commands only; third-party Apps cannot register into it. Commands are plain comment text. Hence discoverability lives in the **PR template** (ships with the scaffold), **`/review help`**, and later a sticky PR-open greeting (M6).
+
+**Q: Should the bot post the available commands after every push?**
+No — one comment per push is the classic noisy-bot failure (a 10-commit PR gets 10 identical comments and members learn to ignore the bot, burying real reviews). Post **once at PR-open** and **edit in place** (sticky comment) when it needs updating. Static hints belong in the PR template, which costs nothing at runtime.
+
+**Q: Do declined/help replies consume review quota?**
+No. They carry a different hidden marker (`fleet-ai-help` vs `fleet-ai-review`) because quota counts LLM calls, and neither runs one. This was a real bug caught during the help build.
+
 ## Site & tooling
 
 **Q: Dark or light theme?** Dark — dev-tool audience, code-heavy content; trust is carried by verifiable claims, not background color. Docs (long-form reading), when they exist, should be light-first/theme-aware.

@@ -82,6 +82,16 @@ Live in **`fleet-services`** (enochhz/fleet-services, scaffolded from our own te
 - **Bug found by the pilot, fixed:** failures *before* the decline path had a token posted nothing to the PR. `handle_review` now wraps everything and always answers the member.
 - Secrets on the service: `ANTHROPIC_API_KEY`, `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`; `MODEL` pinned in Railway vars (env override of `config.py`).
 
+## 6.6 Discoverability (added 2026-08-04)
+
+**GitHub has no slash-command autocomplete for third-party Apps** — the `/` menu only lists GitHub's own commands, and there is no API to register others. So the commands must be advertised where members already look:
+
+1. **PR template** (`template/.github/pull_request_template.md`, ships with the scaffold) — a collapsed "Platform perks" section listing the commands. Static, zero runtime, visible in the description box before the PR exists. **Done.**
+2. **`/review help`** — contextual command menu with remaining quota. Repos with `weekly_limit: 0` are *not* advertised a feature they lack; they get the members.yaml request path instead. **Done.**
+3. **Sticky greeting comment on PR-open** — dynamic (live quota), edited in place rather than re-posted. Deferred to M6's webhook receiver. Deliberately **not** a per-push comment (a 10-commit PR would get 10 identical bot comments and train members to ignore the bot), and deliberately **not** inside the member's `review.yml` (the gate judges code; it shouldn't advertise platform features).
+
+**Quota-integrity fix found while building help:** declines and help replies carry `MARKER_HELP`, not `MARKER` — they run no LLM call, so they must not consume the quota that MARKER-counting measures. Before this, a "diff too large" decline burned a review.
+
 ## 7. Build plan (~1.5 sessions)
 
 1. ✅ **Platform service** (FastAPI, scaffolded from own template; Railway in agent-fleet; secrets: `ANTHROPIC_API_KEY`, fleet App creds): `/api/review` with the checks above. *(The M4 registrar's `/api/register` joins it later.)*
