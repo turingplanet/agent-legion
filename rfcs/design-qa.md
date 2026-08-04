@@ -11,7 +11,7 @@ It's *told*, never discovers: `members.yaml` is the only roster, populated by (1
 **Roster ≠ keys.** `members.yaml` is knowledge; the fleet App installation is access — and an App cannot grant itself access, so only the repo owner can click it. Also check the repo still *exists*: two "Not Found" members (my-agent, my-agent3) turned out to be deleted repos still on the roster.
 
 **Q: The member's repo owner isn't `enochhz` — extra setup needed?**
-For **sync**: one self-service click — install `fleet-migration-bot` on their account, select their repo (scaffolded README documents it). For **platform hosting**: none for the member — but the platform's v1 deploy can't see foreign repos; the fix (fleet-App checkout + `railway up`, plan M6) uses the same App grant they already made.
+For **sync**: one self-service click — install `turing-fleet-bot` on their account, select their repo (scaffolded README documents it). For **platform hosting**: none for the member — but the platform's v1 deploy can't see foreign repos; the fix (fleet-App checkout + `railway up`, plan M6) uses the same App grant they already made.
 
 **Q: A member updated their repo — how does the registry redeploy it?**
 It doesn't, on purpose. Three flows: **code update** = member merges → Railway's GitHub integration rebuilds their service directly (registry uninvolved); **lifecycle** (join/leave hosting, slug change) = `deployments.yaml` diff, admin-merged; **template sync** = bot PR through their gate. Caveat until M6: the gate guards the PR path only — a direct push to main deploys unchecked.

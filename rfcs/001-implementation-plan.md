@@ -27,7 +27,7 @@ M3/M4/M5 are parallel after M2 — pick by appetite. Dotted = only on demand.
 Pending items that interact badly with any new release:
 
 - [x] **Merge the two v0.0.9 sync PRs** (DONE 2026-08-03 — hello-agent#8 needed full re-resolution after a July bot force-push destroyed the hand-resolution; both members now on v0.0.17): [test-agent-2#2](https://github.com/turingplanet/test-agent-2/pull/2), [hello-agent#8](https://github.com/enochhz/hello-agent/pull/8). ⚠️ A bot run before these merge force-pushes `chore/template-sync` and destroys hello-agent#8's hand-resolution (bot cron: **Mondays 06:00 UTC** — check the calendar before starting).
-- [x] **Grant fleet App access on `enochhz`** (All repositories; done 2026-08-03 — the earlier my-agent/my-agent3 failures were deleted repos, since deregistered) (Settings → Applications → fleet-migration-bot → All repositories). Without it, syncs on my-agent/my-agent3 keep failing `Not Found`.
+- [x] **Grant fleet App access on `enochhz`** (All repositories; done 2026-08-03 — the earlier my-agent/my-agent3 failures were deleted repos, since deregistered) (Settings → Applications → turing-fleet-bot → All repositories). Without it, syncs on my-agent/my-agent3 keep failing `Not Found`.
 - [ ] **Delete the accidental `sparkling-ambition` Railway project** (staged Redis/Postgres/bucket — possible billing).
 - [x] Register `legion-demo` in `members.yaml` (+ org-side App grant) (it's the flagship; it should be a fleet member).
 
