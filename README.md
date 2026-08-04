@@ -154,6 +154,37 @@ flowchart LR
 
 **Either way:** nothing merges without you, and every update PR passes through your gate first. And if you've pushed manual fixes to a sync branch (say, resolving conflict markers), the bot **never overwrites them** — each new template version arrives on its own fresh branch. (The bot lives in [agent-registry](https://github.com/turingplanet/agent-registry) and reads the fleet list there.)
 
+## 6. Joining the fleet — the whole setup, in two lines
+
+Scaffolding and running an agent needs **nothing from us** — the template and the review flow are public, and the gate runs in your own CI. Joining the *fleet* (so the platform can keep you in sync and offer you extras) is exactly two steps:
+
+1. **Install the platform's GitHub App** on your agent repo: **https://github.com/apps/turing-fleet-bot** — one click, and only the repo owner can do it (an App can't grant itself access).
+2. **Get added to `members.yaml`** — a PR on [agent-registry](https://github.com/turingplanet/agent-registry) that a platform admin merges. The scaffold offers to open it for you.
+
+That's it. Step 1 is the *keys*, step 2 is the *roster* — you need both, and neither can substitute for the other. (If a sync ever fails with `Not Found`, it's always step 1.)
+
+What the two steps unlock:
+
+| | |
+| --- | --- |
+| **Template syncs** | update PRs on your repo when a new `agent-template` ships — never auto-merged, always through your own gate |
+| **Free AI review** | comment `/review` on any PR for a platform-paid security review (§7) |
+| **Platform hosting** *(optional, admin-approved)* | your agent deployed and served at `<your-slug>.agents.turingplanet.ai` — add an entry to `deployments.yaml` |
+
+Prefer to stay independent? Skip both steps. Your agent still works, still passes the same gate, and you can self-host it anywhere.
+
+## 7. Free AI review on your PRs
+
+Comment **`/review`** on a pull request in a registered repo and the platform's Claude posts a review — **paid for by the platform**, and **advisory only**: it never blocks, your gate decides.
+
+| command | what it does |
+| --- | --- |
+| `/review` | security review (the default) |
+| `/review security` \| `perf` \| `general` | pick the lens |
+| `/review help` | full list + your remaining weekly quota |
+
+Each repo gets a weekly allowance (`ai_review.weekly_limit` in `members.yaml`, set by an admin); `/review help` and declines don't count against it. GitHub doesn't autocomplete third-party commands — just type it as a normal comment.
+
 ## Common questions
 
 | Question | Short answer | More |

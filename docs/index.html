@@ -205,6 +205,7 @@
       <a href="#install"><span class="zh">你到底装了什么</span><span class="en">What you install</span></a>
       <a href="#try"><span class="zh">30 秒试用</span><span class="en">Try in 30s</span></a>
       <a href="#start"><span class="zh">快速开始</span><span class="en">Quickstart</span></a>
+      <a href="#join"><span class="zh">加入舰队</span><span class="en">Join</span></a>
       <a href="https://github.com/turingplanet/agent-legion">GitHub</a>
       <button class="lang-btn" id="langToggle">EN</button>
     </nav>
@@ -391,6 +392,53 @@ flowchart LR
         <span class="en">The repo ships zero-config Railway deployment (<code>railpack.json</code>) — push to GitHub, select the repo in Railway, and you're live with a public <code>/mcp</code> and <code>/api</code>. Full steps are in your generated README. <strong>Or request platform hosting</strong>: once admin-approved, the platform deploys your agent automatically and gives it its own domain — <code>your-name.agents.turingplanet.ai</code> (HTTPS included, zero config).</span>
       </li>
     </ol>
+  </section>
+
+  <section id="join" class="reveal">
+    <span class="kicker"><span class="zh">加入</span><span class="en">Join</span></span>
+    <h2><span class="zh">加入舰队 —— 只需两步</span><span class="en">Joining the fleet — just two steps</span></h2>
+    <p class="sub">
+      <span class="zh">写 Agent、跑测试、过门禁 —— 这些<strong>完全不需要我们</strong>（模板和审查流程都是公开的，门禁跑在你自己的 CI 里）。只有当你想加入舰队、享受平台提供的额外服务时，才需要这两步：</span>
+      <span class="en">Building, testing, and passing the gate needs <strong>nothing from us</strong> — the template and review flow are public, and the gate runs in your own CI. Only joining the fleet (for the platform's extras) takes these two steps:</span>
+    </p>
+    <ol class="steps">
+      <li>
+        <strong><span class="zh">安装平台的 GitHub App</span><span class="en">Install the platform's GitHub App</span></strong><br>
+        <a href="https://github.com/apps/turing-fleet-bot">github.com/apps/turing-fleet-bot</a> —
+        <span class="zh">一次点击，只有仓库拥有者能授权（App 无法自己授予自己权限）。这就是「钥匙」。</span>
+        <span class="en">one click, and only the repo owner can grant it (an App can't grant itself access). These are the <em>keys</em>.</span>
+      </li>
+      <li>
+        <strong><span class="zh">被加入 members.yaml</span><span class="en">Get added to members.yaml</span></strong><br>
+        <span class="zh">在 <a href="https://github.com/turingplanet/agent-registry">agent-registry</a> 开一个 PR，由管理员合并 —— 脚手架可以帮你自动开。这就是「名册」。</span>
+        <span class="en">a PR on <a href="https://github.com/turingplanet/agent-registry">agent-registry</a> that an admin merges — the scaffold offers to open it for you. This is the <em>roster</em>.</span>
+      </li>
+    </ol>
+    <div class="cards" style="margin-top:20px">
+      <div class="card">
+        <span class="badge"><span class="zh">同步</span><span class="en">SYNC</span></span>
+        <h3><span class="zh">模板更新自动送达</span><span class="en">Template updates</span></h3>
+        <p><span class="zh">新版本发布时，机器人在你的仓库开 PR —— 永不自动合并，永远先过你自己的门禁。</span><span class="en">When a new version ships, the bot opens a PR on your repo — never auto-merged, always through your own gate.</span></p>
+      </div>
+      <div class="card">
+        <span class="badge"><span class="zh">免费审查</span><span class="en">FREE REVIEW</span></span>
+        <h3><span class="zh">平台付费的 AI 审查</span><span class="en">Platform-paid AI review</span></h3>
+        <p><span class="zh">在任意 PR 下评论 <code>/review</code>，平台的 Claude 给出安全审查 —— 我们付费，纯建议、永不拦截。</span><span class="en">Comment <code>/review</code> on any PR and the platform's Claude posts a security review — we pay, advisory only, never blocking.</span></p>
+      </div>
+      <div class="card">
+        <span class="badge"><span class="zh">托管</span><span class="en">HOSTING</span></span>
+        <h3><span class="zh">专属域名（可选）</span><span class="en">Your own subdomain (optional)</span></h3>
+        <p><span class="zh">审批通过后，平台自动部署并分配 <code>你的名字.agents.turingplanet.ai</code>，含 HTTPS。</span><span class="en">Once approved, the platform deploys your agent at <code>your-name.agents.turingplanet.ai</code>, HTTPS included.</span></p>
+      </div>
+    </div>
+    <p class="note">
+      <span class="zh"><strong>想保持独立？两步都可以跳过。</strong>你的 Agent 照常工作、照常过同一套门禁，也可以自己部署到任何地方 —— 加入舰队永远是可选的。</span>
+      <span class="en"><strong>Prefer to stay independent?</strong> Skip both steps. Your agent still works, still passes the same gate, and you can self-host it anywhere — joining is always optional.</span>
+    </p>
+    <p style="font-size:.94rem;color:var(--muted)">
+      <span class="zh">审查命令：<code>/review</code>（默认安全）· <code>/review perf</code> · <code>/review general</code> · <code>/review help</code>（查看剩余额度）。每个仓库有每周额度；GitHub 不会自动补全第三方命令，直接当普通评论输入即可。</span>
+      <span class="en">Commands: <code>/review</code> (security by default) · <code>/review perf</code> · <code>/review general</code> · <code>/review help</code> (shows remaining quota). Each repo has a weekly allowance; GitHub doesn't autocomplete third-party commands, so just type it as a normal comment.</span>
+    </p>
   </section>
 
   <section id="faq" class="reveal">
