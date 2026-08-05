@@ -85,6 +85,8 @@ Implements RFC §3–§4, §7, §10 (template side).
 Implements RFC §10 v1. **Recommendation: a dedicated tiny `registrar` service, scaffolded from your own template** (dogfooding), *not* piggybacked on legion-demo — the registrar holds a credential that can write to agent-registry, and the public demo agent is the wrong place for that blast radius.
 
 - [ ] `POST /api/register {repo}`: validate repo exists + its manifest says `register: true` (read via GitHub API); idempotent vs `members.yaml` + open PRs; simple rate limit.
+- [ ] **`/register` PR command** (alias `/join`) — same pipeline as `/review`: collaborator check → manifest-consent check → registrar → reply with the PR link. The recovery path for "forgot at scaffold time." Requires a one-line filter widening in the template's trigger workflow (`/review` → `/review|/register|/join`), riding the next template release.
+- [ ] **Funnel the decline**: the `/review` "not registered" decline should say "reply `/register` to request membership" — and registration replies must distinguish "PR opened, awaiting admin" from failure (UX gap found live 2026-08-05: pre-M4, a member can't tell pending-infrastructure from silent failure).
 - [ ] Opens the members.yaml PR with a platform App token (App needs contents+PR write on agent-registry — config, not code).
 - [ ] Deploy to Railway (platform account).
 - [ ] End-to-end: scaffold → push to a throwaway repo → PR appears on registry → admin merges → bot syncs it.
