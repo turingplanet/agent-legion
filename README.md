@@ -6,6 +6,17 @@ A platform for building and running lots of small AI agents (served over **MCP**
 
 If a word here ever feels like jargon, jump to the **[plain-language glossary](#plain-language-glossary)** at the bottom.
 
+## Which one are you? (pick your path)
+
+| | you want | your first command | your full guide |
+|---|---|---|---|
+| 👀 **Just curious** | try a live agent — install nothing | `claude mcp add --transport http legion-demo https://agent-demo.turingplanet.ai/mcp` | [agents.turingplanet.ai](https://agents.turingplanet.ai) |
+| 🆕 **Starting from scratch** | a working agent in minutes | `copier copy --trust gh:turingplanet/agent-template ./my-agent` | [agent-template quickstart](https://github.com/turingplanet/agent-template#readme) |
+| 📦 **Have an existing project** | adopt the platform *around* your code — nothing moved, rewritten, or deleted | `curl -fsSL https://raw.githubusercontent.com/turingplanet/agent-template/main/detect.sh \| bash` *(inside your repo)* | [MIGRATE.md](https://github.com/turingplanet/agent-template/blob/main/MIGRATE.md) — written to be handed to your AI |
+| 🚀 **Built it, want the perks** | fleet sync + free `/review` + hosting at `you.agents.turingplanet.ai` | install the App: [github.com/apps/turing-fleet-bot](https://github.com/apps/turing-fleet-bot), then comment `/register` on any PR | [Joining the fleet (§6)](#6-joining-the-fleet--the-whole-setup-in-two-lines) · [platform hosting](https://github.com/turingplanet/agent-registry#readme) |
+
+Each guide is the single source of truth for its path — the sections below explain *how the machine works* rather than *what to type*.
+
 ## 1. The big picture: three repos
 
 There are only **three** repositories, and each has one job:
