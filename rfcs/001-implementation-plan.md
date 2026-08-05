@@ -118,6 +118,7 @@ Railway requires a **per-subdomain TXT verification record** and assigns a **uni
 
 - **Cross-account platform hosting** (known v1 limitation, found 2026-08-03): `serviceCreate(source:{repo})` relies on OUR Railway's GitHub connection, which can't see other members' repos. Fix per RFC §5's original design: deploy workflow checks out the member repo with the **fleet App token** (which members already grant for sync — zero extra setup for them) and pushes via `railway up`. Natural place to also enforce **gate-green-at-deploy** (check commit status before deploying) — today the gate only guards the PR path; direct pushes to main deploy unchecked.
 - Webhook receiver — **one service, two features**: App-install-as-registration (RFC §10 v2) + instant platform CD (RFC §5.4). Touches the same code path as the item above — bundle them.
+- **`/deploy` self-service hosting request** (gap surfaced by the e2e docs 2026-08-05): members can self-register but can't self-request hosting — the deployments.yaml entry is admin-typed today. Same shape as `/register`: command → registrar-style endpoint → deployments.yaml PR, admin merges. Include limits in the PR body for the admin to review.
 - Platform advisor LLM tool (RFC §4) — has ongoing cost + abuse surface; wait for members to ask.
 - `agent-template-<lang>` siblings — wait for a real non-Python member; first one is us testing the gate (RFC §3-D).
 
