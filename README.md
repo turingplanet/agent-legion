@@ -116,7 +116,7 @@ Each agent is its **own repo that you own**, scaffolded from `agent-template` wi
 
 ```mermaid
 flowchart TB
-    A["You want to build an agent"] --> B["Scaffold with Copier:<br/>copier copy gh:turingplanet/agent-template ./my-agent"]
+    A["You want to build an agent"] --> B["Scaffold with Copier:<br/>copier copy --trust gh:turingplanet/agent-template ./my-agent"]
     B --> C["A new repo YOU own, with a .copier-answers.yml<br/>recording which template version it came from"]
     C --> D["Replace the placeholder code in /api + /mcp,<br/>edit agent.manifest.yaml if needed"]
     D --> E["Open a Pull Request inside your repo<br/>(your branch → your main)"]
@@ -200,7 +200,7 @@ Each repo gets a weekly allowance (`ai_review.weekly_limit` in `members.yaml`, s
 
 | Question | Short answer | More |
 | --- | --- | --- |
-| **How do I generate a repo from the template?** | Scaffold with Copier (`copier copy gh:turingplanet/agent-template ./my-agent`), push it as your own repo, smoke-test it, then write your code. | [§3](#3-how-you-build-an-agent-start-here) · [agent-template](https://github.com/turingplanet/agent-template) |
+| **How do I generate a repo from the template?** | Scaffold with Copier (`copier copy --trust gh:turingplanet/agent-template ./my-agent`), push it as your own repo, smoke-test it, then write your code. | [§3](#3-how-you-build-an-agent-start-here) · [agent-template](https://github.com/turingplanet/agent-template) |
 | **`policies` changed — do I update by hand? Will I be told?** | You're **pinned and never force-updated**. Adopt by bumping the version in your `review.yml` (the `uses:@vN` line **and** its matching `policies_ref:`). The migration bot opens that PR for you — **the PR is the notification** — or do it by hand anytime. | [§5](#5-how-updates-reach-you) · [policies](https://github.com/turingplanet/policies) |
 | **The template changed — do I update by hand? Will I be told?** | The migration bot opens a `copier update` PR on your repo automatically (again, the PR is the notification); or run `copier update` yourself. Your `/api` + `/mcp` code is preserved either way. | [§5](#5-how-updates-reach-you) · [agent-template](https://github.com/turingplanet/agent-template) |
 

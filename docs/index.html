@@ -234,7 +234,7 @@
     <div class="term">
       <div class="term-bar"><i></i><i></i><i></i><span>zsh — my-agent</span></div>
       <div class="term-body">
-<span class="p">$</span> copier copy gh:turingplanet/agent-template ./my-agent<br>
+<span class="p">$</span> copier copy --trust gh:turingplanet/agent-template ./my-agent<br>
 <span class="c">🎤 project_name? <span class="o">my-agent</span> · register in fleet? <span class="o">up to you</span></span><br>
 <span class="p">$</span> cd my-agent &amp;&amp; poetry install &amp;&amp; poetry run pytest<br>
 <span class="c">✓ 4 passed — your agent is alive at /api + /mcp</span>
@@ -370,7 +370,7 @@ flowchart LR
     <ol class="steps">
       <li>
         <strong><span class="zh">生成你自己的 Agent 仓库</span><span class="en">Generate your own agent repo</span></strong>
-        <pre><button class="copy-btn" data-copy>copy</button><code>copier copy gh:turingplanet/agent-template ./my-agent &amp;&amp; cd my-agent</code></pre>
+        <pre><button class="copy-btn" data-copy>copy</button><code>copier copy --trust gh:turingplanet/agent-template ./my-agent &amp;&amp; cd my-agent</code></pre>
         <span class="zh">回答几个问题（项目名默认取文件夹名；是否注册进舰队 —— 可以选否）。</span>
         <span class="en">Answer a few questions (project name defaults to the folder; fleet registration — feel free to say no).</span>
       </li>
