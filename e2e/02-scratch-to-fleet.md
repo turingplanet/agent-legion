@@ -58,8 +58,31 @@ gh pr view 1 --repo enochhz/$SLUG --comments | tail -25
 ```
 → a real security review with the quota footer (default 2/week).
 
+
+## Optional: platform hosting (admin-gated)
+
+Once admitted, your agent can be hosted at `$SLUG.agents.turingplanet.ai`.
+The request is an entry in the registry's `deployments.yaml` — **only an admin
+can merge it** (today the admin adds it directly; a self-service `/deploy`
+command is a future item). If you ARE the admin:
+
+```bash
+cd /Users/haozheng/Claude_Projects/agent-军团/agent-registry && git pull -q && printf '  - slug: %s\n    repo: enochhz/%s\n    host: platform\n' "$SLUG" "$SLUG" >> deployments.yaml && git commit -qam "deploy: $SLUG" && git push
+```
+
+~2–3 min later (the push IS the deploy trigger — service created, routed, TLS included):
+
+```bash
+curl https://$SLUG.agents.turingplanet.ai/api/health
+```
+→ `{"ok":true,"agent":"<slug>"}` — and pushes to your repo's main now auto-redeploy.
+
+Full walkthrough incl. the kill switch: [05-platform-hosting.md](05-platform-hosting.md).
+
 ## Teardown
 ```bash
 gh repo delete enochhz/$SLUG --yes && rm -rf ~/Claude_Projects/$SLUG
 ```
-Then remove the member entry from `agent-registry/members.yaml` (one-line PR/commit).
+Then remove the member entry from `agent-registry/members.yaml` — and, if you
+did the hosting step, its `deployments.yaml` entry too (the kill switch: the
+push tears the service + route down).

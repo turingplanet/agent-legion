@@ -40,6 +40,15 @@ git checkout -b adopt-platform && git add -A && git commit -m "Adopt platform se
 ```
 → gate runs **your** manifest commands; green = migrated.
 
+
+## Optional: keep going — member perks + hosting
+
+A migrated repo is a first-class member: registration (`/register` on any PR,
+or `fleet.register: true` + push), then `/review`, then optional platform
+hosting at `my-legacy-app.agents.turingplanet.ai` — identical to the scratch
+path from here on. Follow [02-scratch-to-fleet.md](02-scratch-to-fleet.md)
+steps 6–9 and its hosting section with `SLUG=my-legacy-app`.
+
 ## Teardown
 ```bash
 gh repo delete enochhz/my-legacy-app --yes && rm -rf ~/Claude_Projects/my-legacy-app
