@@ -80,16 +80,16 @@ Implements RFC §3–§4, §7, §10 (template side).
 - [ ] Site: quickstart gains the one-liner; new "Have an existing project?" section linking MIGRATE.md.
 - [ ] Verify in a clean container/VM: `curl -fsSL … | bash` both modes.
 
-## M4 — Registrar v1 (1–2 sessions) — *activates M2's register.yml*
+## M4 — Registrar v1 — ✅ SHIPPED 2026-08-05 (lives in fleet-services, as revised)
 
 Implements RFC §10 v1. **Recommendation: a dedicated tiny `registrar` service, scaffolded from your own template** (dogfooding), *not* piggybacked on legion-demo — the registrar holds a credential that can write to agent-registry, and the public demo agent is the wrong place for that blast radius.
 
-- [ ] `POST /api/register {repo}`: validate repo exists + its manifest says `register: true` (read via GitHub API); idempotent vs `members.yaml` + open PRs; simple rate limit.
-- [ ] **`/register` PR command** (alias `/join`) — same pipeline as `/review`: collaborator check → manifest-consent check → registrar → reply with the PR link. The recovery path for "forgot at scaffold time." Requires a one-line filter widening in the template's trigger workflow (`/review` → `/review|/register|/join`), riding the next template release.
-- [ ] **Funnel the decline**: the `/review` "not registered" decline should say "reply `/register` to request membership" — and registration replies must distinguish "PR opened, awaiting admin" from failure (UX gap found live 2026-08-05: pre-M4, a member can't tell pending-infrastructure from silent failure).
-- [ ] Opens the members.yaml PR with a platform App token (App needs contents+PR write on agent-registry — config, not code).
-- [ ] Deploy to Railway (platform account).
-- [ ] End-to-end: scaffold → push to a throwaway repo → PR appears on registry → admin merges → bot syncs it.
+- [x] `POST /api/register {repo}`: validate repo exists + its manifest says `register: true` (read via GitHub API); idempotent vs `members.yaml` + open PRs; simple rate limit.
+- [x] **`/register` PR command** (alias `/join`) — same pipeline as `/review`: collaborator check → manifest-consent check → registrar → reply with the PR link. The recovery path for "forgot at scaffold time." Requires a one-line filter widening in the template's trigger workflow (`/review` → `/review|/register|/join`), riding the next template release.
+- [x] **Funnel the decline** (registration replies distinguish pr_opened/pr_pending/already/cooldown/app-missing/no-consent): the `/review` "not registered" decline should say "reply `/register` to request membership" — and registration replies must distinguish "PR opened, awaiting admin" from failure (UX gap found live 2026-08-05: pre-M4, a member can't tell pending-infrastructure from silent failure).
+- [x] Opens the members.yaml PR with a platform App token (App needs contents+PR write on agent-registry — config, not code).
+- [x] Deployed via fleet-services auto-CD.
+- [x] End-to-end verified live: enochhz/reg-test2 → registrar → agent-registry#14 opened; /register comment loop replies on the member PR; idempotency + cooldown guards proven. Bonus design win: the registrar fetches the manifest WITH a fleet App token, so a missing App install fails fast with the install link — roster-vs-keys solved in one flow.
 
 **Done when:** a stranger-shaped test account can go scaffold→push→registered with zero manual steps besides your merge.
 
