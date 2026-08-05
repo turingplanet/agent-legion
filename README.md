@@ -240,6 +240,7 @@ Each repo gets a weekly allowance (`ai_review.weekly_limit` in `members.yaml`, s
 - **The fleet inventory + auto-migration bot?** → [agent-registry](https://github.com/turingplanet/agent-registry)
 - **What runs `/review` (and holds the platform's keys)?** → [fleet-services](https://github.com/turingplanet/fleet-services)
 - **What serves `*.agents.turingplanet.ai`?** → [fleet-router](https://github.com/turingplanet/fleet-router)
+- **Want to test any scenario end-to-end from a terminal?** → [e2e walkthroughs](e2e/README.md) — copy-paste runbooks with expected outputs
 
 ## Status
 
