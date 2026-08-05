@@ -60,19 +60,19 @@ Jul 20 + 27. Cron is now **disabled** until these land in
 
 Implements RFC §3–§4, §7, §10 (template side).
 
-- [ ] **`adopt_mode`** copier question + conditional generation: seam files only (`agent.manifest.yaml`, `.copier-answers.yml`, `review.yml`, `mcp_server/`, `config.py`, `railpack.json`); skip `api/`, `tests/`, `pyproject.toml` when adopting. Manifest build/test commands become editable questions.
-- [ ] **`fleet.register` manifest field**, set by the existing explicit yes/no copier question; **delete the `github_repo` question** (no longer needed — see register.yml).
-- [ ] **`register.yml`** push-workflow: reads the flag + `github.repository`; calls the registrar; **exits 0 quietly if the registrar doesn't exist yet** (lets this ship before M4). `register-in-fleet.sh` demoted to manual fallback.
-- [ ] **`detect.sh`**: language/stack, MCP deps, `mcp/`-dir collision check, gitleaks if installed → prints scenario + recommendation (RFC §4 preflight).
-- [ ] **`MIGRATE.md`**: opens with the 5-scenario decision table (RFC §3), per-scenario runbook, written to be handed to Claude Code; includes the going-public history-hygiene checklist.
-- [ ] README updates (scaffolded + root): "have an existing project?" pointer.
+- [x] **`adopt_mode`** copier question + conditional generation: seam files only (`agent.manifest.yaml`, `.copier-answers.yml`, `review.yml`, `mcp_server/`, `config.py`, `railpack.json`); skip `api/`, `tests/`, `pyproject.toml` when adopting. Manifest build/test commands become editable questions.
+- [x] **`fleet.register` manifest field** (needed policies v0.0.8: schema gains optional `fleet` key), set by the existing explicit yes/no copier question; **delete the `github_repo` question** (no longer needed — see register.yml).
+- [x] **`register.yml`** push-workflow: reads the flag + `github.repository`; calls the registrar; **exits 0 quietly if the registrar doesn't exist yet** (lets this ship before M4). `register-in-fleet.sh` demoted to manual fallback.
+- [x] **`detect.sh`**: language/stack, MCP deps, `mcp/`-dir collision check, gitleaks if installed → prints scenario + recommendation (RFC §4 preflight).
+- [x] **`MIGRATE.md`**: opens with the 5-scenario decision table (RFC §3), per-scenario runbook, written to be handed to Claude Code; includes the going-public history-hygiene checklist.
+- [x] README updates (scaffolded + root) + platform-review.yml + PR template bundled in: "have an existing project?" pointer.
 
 **Verify (the gate for this milestone):**
-- [ ] Fresh scaffold: pytest ✓ · stdio round-trip ✓ · HTTP `/mcp`+`/api` ✓ · gate green ✓.
-- [ ] **Adoption fixture**: a fake "existing FastAPI repo" → `adopt_mode` → wire one tool → gate green. Keep the fixture repo; it becomes the permanent regression test for migration.
-- [ ] `copier update` from a v0.0.17 member is a clean 3-way merge.
+- [x] Fresh scaffold: pytest ✓ · stdio round-trip ✓ · HTTP `/mcp`+`/api` ✓ · gate green ✓.
+- [x] **Adoption fixture** verified (fake FastAPI repo in src/services: files untouched, custom commands, empty lint/security omitted). TODO: promote to a permanent regression repo → `adopt_mode` → wire one tool → gate green. Keep the fixture repo; it becomes the permanent regression test for migration.
+- [x] `copier update` from a v0.0.18 member verified; fleet-wide sync 6/6 green and MERGED — entire fleet on v0.0.19 (2026-08-05). Incidents during rollout, all resolved: hello-fleet's gate caught a test broken by a direct-to-main push (the gate works); hello-agent's PR showed no checks because a main-side edit made it CONFLICTING — pull_request workflows can't run without a merge ref (now in design-qa).
 
-**Done when:** all three verifications pass · tagged `v0.0.19` · bot run green.
+**Done when:** all three verifications pass · tagged `v0.0.19` · bot run green. ✅ COMPLETE 2026-08-05.
 
 ## M3 — setup.sh + site (1 session)
 

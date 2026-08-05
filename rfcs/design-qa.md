@@ -47,6 +47,9 @@ Don't — they're one-time by design (2 CNAMEs: wildcard + ACME delegation; no p
 **Q: Whatever lands in a member repo auto-deploys?**
 Pushes to **main** only, and only if the service has a **deployment trigger**. Gotcha (cost us a day of misdiagnosis): `serviceCreate(source:{repo})` sets the source but creates **no trigger**, so API-created services have silently dead CD — it is *not* a GitHub App permission problem. Fix: `deploymentTriggerCreate(provider:"github", repository, branch:"main", checkSuites:true)`; deploy-fleet.py now does this for every new service.
 
+**Q: A PR shows "no checks reported" and the gate never runs — Actions broken?**
+Check `mergeable` first: a **CONFLICTING** PR has no merge ref, and `pull_request` workflows run on the merge ref — so GitHub creates no check runs at all. Fix the conflict (merge base into the branch); checks appear immediately. Cost us an hour of ghost-hunting on 2026-08-05.
+
 ## Platform AI review (RFC 002)
 
 **Q: Why doesn't `/review` show up in GitHub's slash-command autocomplete?**
