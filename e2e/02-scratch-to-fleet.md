@@ -34,9 +34,13 @@ members.yaml PR:
 git init && git add -A && git commit -m "Scaffold" && gh repo create enochhz/$SLUG --public --source . --push
 ```
 
-6. Watch the registration workflow's verdict (wait ~30s first):
+6. Watch the registration workflow's verdict (wait ~30s first). Guard against
+an unset `$SLUG` (new terminal?) — the composed command fails silently otherwise:
 ```bash
-gh run view --repo enochhz/$SLUG $(gh run list --repo enochhz/$SLUG --workflow register --limit 1 --json databaseId -q '.[0].databaseId') --log | grep "registrar says"
+test -n "$SLUG" || echo "SLUG is unset — export SLUG=<your-repo-name> first"
+```
+```bash
+RID=$(gh run list --repo enochhz/$SLUG --workflow register --limit 1 --json databaseId -q '.[0].databaseId') && gh run view --repo enochhz/$SLUG "$RID" --log | grep "registrar says" || echo "no verdict line — inspect the full log: gh run view --repo enochhz/$SLUG $RID --log"
 ```
 → `registrar says: {"status":"pr_opened","pr":"https://github.com/turingplanet/agent-registry/pull/N"}`
 (or `app_not_installed` with the install link if the App doesn't cover this repo — install and push again)
