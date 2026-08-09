@@ -16,7 +16,10 @@ export REPO=enochhz/hello-fleet PR=1   # adjust to your member repo + open PR
 | `/review` on a **non-member** repo | decline + "Reply `/register` to request membership" |
 | `/register` on a non-member repo | 📬 registration PR opened (or ⏳ pending / 🔑 install-the-App / cooldown) |
 
-Post one like this, wait ~60–90s, read:
+Post one like this. You get feedback immediately: within ~10s the bot 👀-reacts
+to your comment and posts "🔍 Review in progress" — then **edits that same
+comment in place** with the result (~1–2 min total, no second notification).
+If the progress message hasn't updated after ~5 min, re-run the command.
 ```bash
 gh pr comment $PR --repo $REPO --body "/review help"
 ```
