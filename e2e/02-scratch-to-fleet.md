@@ -14,8 +14,9 @@ registration** (register.yml + `/register`), and `/review` after admission.
 | 5 · **Admission** | members.yaml PR merged — membership granted | wait, or nudge with `/register` on any PR | [step 7](#step-7) — **merge = the decision** |
 | 6 · Ship code | branch → PR → the gate decides | [step 8](#step-8) | — |
 | 7 · AI review | `/review` posts a platform-paid review | [step 9](#step-9) | quota via members.yaml |
-| 8 · Hosting *(optional)* | live at `slug.agents.turingplanet.ai` | ask the admin (self-service `/deploy` is a future item) | [hosting section](#optional-platform-hosting-admin-gated) |
-| 9 · Teardown | leave the fleet / delete the repo — one script | [`scripts/teardown.sh`](#teardown) | **merge the removal PR** ([teardown](#teardown)) |
+| 8 · Stay current | template updates arrive as PRs — never auto-merged | [merge the bot's PR, or self-update](#optional-staying-up-to-date-two-paths-same-destination) | — (cuts releases; the bot opens PRs) |
+| 9 · Hosting *(optional)* | live at `slug.agents.turingplanet.ai` | ask the admin (self-service `/deploy` is a future item) | [hosting section](#optional-platform-hosting-admin-gated) |
+| 10 · Teardown | leave the fleet / delete the repo — one script | [`scripts/teardown.sh`](#teardown) | **merge the removal PR** ([teardown](#teardown)) |
 
 The split is the platform's core deal: **members act, admins admit (and release)** — every
 admin cell is a PR merge, never a manual setup task. Entry and exit are symmetric:
