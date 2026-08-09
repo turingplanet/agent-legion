@@ -17,7 +17,15 @@ regenerates the router table, rebuilds the router pinned to that commit):
 gh run watch --repo turingplanet/agent-registry $(gh run list --repo turingplanet/agent-registry --workflow deploy-fleet --limit 1 --json databaseId -q '.[0].databaseId')
 ```
 
-3. ~2–3 min later — TLS included, zero DNS work performed:
+3. ~2–3 min later — TLS included, zero DNS work performed. From the member repo,
+one command checks REST **and** performs a real MCP handshake + tool listing
+(ships in the scaffold from template ≥ v0.0.22):
+```bash
+bash scripts/test_platform_mcp.sh
+```
+→ `✅ /api/health` · `✅ /mcp handshake OK` · `✅ tools/list → tool_say_hi, tool_run` · a ready-to-paste `claude mcp add` line.
+
+Or by hand:
 ```bash
 curl https://$SLUG.agents.turingplanet.ai/api/health
 ```
