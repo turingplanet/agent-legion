@@ -95,7 +95,7 @@ The four repos above are **files**. Two more are **services the platform runs** 
 | repo | what it does | when it touches you |
 | --- | --- | --- |
 | [fleet-router](https://github.com/turingplanet/fleet-router) | the edge router: one wildcard domain (`*.agents.turingplanet.ai`) whose Caddy routing table is generated from `agent-registry/deployments.yaml` | only if you opt into platform hosting — it's what serves `<your-slug>.agents.turingplanet.ai` |
-| [fleet-services](https://github.com/turingplanet/fleet-services) | holds the platform's credentials (LLM key, GitHub App) so member CI never has to: runs `/review` (§7) and, soon, auto-registration | only when you ask — e.g. commenting `/review` on your PR |
+| [fleet-services](https://github.com/turingplanet/fleet-services) | holds the platform's credentials (LLM key, GitHub App) so member CI never has to: runs `/review` (§7), self-service registration (`/register` or push, §6), and teardown (`scripts/teardown.sh`) | only when you ask — a PR comment, a push with `fleet.register: true`, or the teardown script |
 
 Both follow the same rule as everything else: **they act with the platform's own credentials on the platform's own side**, and member repos only ever send public metadata (repo name, PR number). Nothing of yours is stored.
 
