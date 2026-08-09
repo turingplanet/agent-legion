@@ -41,6 +41,17 @@ gh run view --repo enochhz/$SLUG $(gh run list --repo enochhz/$SLUG --workflow r
 → `registrar says: {"status":"pr_opened","pr":"https://github.com/turingplanet/agent-registry/pull/N"}`
 (or `app_not_installed` with the install link if the App doesn't cover this repo — install and push again)
 
+> **Behind the scenes:** that PR is opened **on agent-registry (the platform's
+> repo), not on yours** — authored by the platform with its own credentials,
+> because your CI can't touch the private registry (secrets never cross
+> accounts). Your repo only sent its name; the registrar verified the App
+> install (keys) and your manifest's `fleet.register: true` (consent) before
+> writing anything. The PR is **inert until an admin merges it** — no command
+> or push can make you a member; only the merge can. List pending ones:
+> ```bash
+> gh pr list --repo turingplanet/agent-registry
+> ```
+
 7. **Admin moment**: merge that PR on agent-registry. Membership = your merge.
 
 8. Open a PR and use the perks — note the PR template's "Platform perks" section:
