@@ -121,6 +121,12 @@ curl https://$SLUG.agents.turingplanet.ai/api/health
 Full walkthrough incl. the kill switch: [05-platform-hosting.md](05-platform-hosting.md).
 
 ## Teardown
+
+**v0.0.21+ scaffolds: one script does all of this** — `bash scripts/teardown.sh`
+(interactive) or `--unregister` / `--delete-repo --yes` for automation. It flips
+`fleet.register: false` (your consent, verified by the platform), opens the
+registry removal PR (membership + hosting in one; merging tears hosting down),
+and optionally deletes the repo. Manual equivalent below for older scaffolds:
 ```bash
 gh repo delete enochhz/$SLUG --yes && rm -rf ~/Claude_Projects/$SLUG
 ```
