@@ -101,6 +101,40 @@ gh pr view 1 --repo enochhz/$SLUG --comments | tail -25
 → a real security review with the quota footer (default 2/week).
 
 
+## Optional: staying up to date (two paths, same destination)
+
+Template improvements reach your repo **only ever as a PR you merge** — the
+platform's automation has no merge step, by founding design. Pick either path:
+
+**Path A — the platform updates you (do nothing):** when a new template version
+ships, the fleet bot opens a version-scoped PR on your repo
+(`chore/template-sync-vX.Y.Z`). Your own gate runs on it; you review and merge —
+in the GitHub UI, or:
+```bash
+gh pr list                       # see the waiting sync PR
+```
+```bash
+gh pr merge <N> --squash --delete-branch
+```
+The bot never force-pushes over your manual commits on that branch, never
+auto-merges, and a new version always gets a fresh PR.
+
+**Path B — update yourself (don't wait for the bot):**
+```bash
+git switch -c chore/manual-sync && copier update --defaults --trust --conflict inline
+```
+```bash
+git add -A && git commit -m "chore: sync to the latest agent-template" && git push -u origin chore/manual-sync && gh pr create --fill
+```
+Same 3-way merge the bot performs (your code preserved, conflicts as `<<<<<<<`
+markers), through the same gate, merged by the same person: you. The bot's next
+run will see you're current and skip you.
+
+> **The invariant, explicitly:** nothing the platform runs can land commits on
+> your `main`. Every change arrives as a PR; merging is yours alone. Want that
+> structurally enforced too? Add branch protection on `main` in your repo
+> settings — the platform works identically either way.
+
 ## Optional: platform hosting (admin-gated)
 
 Once admitted, your agent can be hosted at `$SLUG.agents.turingplanet.ai`.
