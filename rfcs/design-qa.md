@@ -50,6 +50,9 @@ Pushes to **main** only, and only if the service has a **deployment trigger**. G
 **Q: A PR shows "no checks reported" and the gate never runs — Actions broken?**
 Check `mergeable` first: a **CONFLICTING** PR has no merge ref, and `pull_request` workflows run on the merge ref — so GitHub creates no check runs at all. Fix the conflict (merge base into the branch); checks appear immediately. Cost us an hour of ghost-hunting on 2026-08-05.
 
+**Q: Can the platform auto-merge into a member's main? It looked like it did.**
+No — the bot's only verb is *open a PR*; there is no merge call anywhere in the sync machinery, and a new template version always arrives as a fresh version-scoped PR the member merges themselves (GUI, `gh pr merge`, or self-`copier update`). What *looks* like auto-merging in our own repos is the admin (or their AI assistant, on request) merging with the admin's credentials — human action, not platform machinery. Nuance: the guarantee is behavioral (the code doesn't merge), not structural (the App's Contents-write could technically push); members wanting a structural lock add branch protection on main. Documented in e2e/02 "staying up to date".
+
 ## Platform AI review (RFC 002)
 
 **Q: Why doesn't `/review` show up in GitHub's slash-command autocomplete?**
