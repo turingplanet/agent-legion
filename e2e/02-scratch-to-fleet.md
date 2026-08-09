@@ -15,10 +15,11 @@ registration** (register.yml + `/register`), and `/review` after admission.
 | 6 · Ship code | branch → PR → the gate decides | [step 8](#step-8) | — |
 | 7 · AI review | `/review` posts a platform-paid review | [step 9](#step-9) | quota via members.yaml |
 | 8 · Hosting *(optional)* | live at `slug.agents.turingplanet.ai` | ask the admin (self-service `/deploy` is a future item) | [hosting section](#optional-platform-hosting-admin-gated) |
-| 9 · Teardown | remove everything cleanly | [teardown](#teardown) | roster + deploy entries ([teardown](#teardown)) |
+| 9 · Teardown | leave the fleet / delete the repo — one script | [`scripts/teardown.sh`](#teardown) | **merge the removal PR** ([teardown](#teardown)) |
 
-The split is the platform's core deal: **members act, admins admit** — every
-admin cell is a PR merge, never a manual setup task.
+The split is the platform's core deal: **members act, admins admit (and release)** — every
+admin cell is a PR merge, never a manual setup task. Entry and exit are symmetric:
+manifest intent → platform-authored PR → admin merge.
 
 ## Steps
 
@@ -122,14 +123,38 @@ Full walkthrough incl. the kill switch: [05-platform-hosting.md](05-platform-hos
 
 ## Teardown
 
-**v0.0.21+ scaffolds: one script does all of this** — `bash scripts/teardown.sh`
-(interactive) or `--unregister` / `--delete-repo --yes` for automation. It flips
-`fleet.register: false` (your consent, verified by the platform), opens the
-registry removal PR (membership + hosting in one; merging tears hosting down),
-and optionally deletes the repo. Manual equivalent below for older scaffolds:
+**One script, mirroring the join** (ships with every v0.0.21+ scaffold):
+
+Interactive — two questions (delete repo entirely? / leave the fleet?):
+```bash
+bash scripts/teardown.sh
+```
+→ flips `fleet.register: false` (your consent — the platform verifies it), pushes,
+and prints `registrar says: {"status":"pr_opened",...}` with the **removal PR** link.
+That one PR removes your members.yaml entry AND any platform-hosting entry.
+
+**Admin moment (the mirror of admission):** merge the removal PR — membership
+ends, and if you were platform-hosted, the deploy reconciler tears the service
+and route down on that same merge. Closing the PR = you stay.
+
+Non-interactive, for automation:
+```bash
+bash scripts/teardown.sh --unregister          # leave the fleet, keep the repo
+```
+```bash
+bash scripts/teardown.sh --delete-repo --yes   # leave AND delete the GitHub repo
+```
+Repo deletion needs the scope once: `gh auth refresh -h github.com -s delete_repo`.
+The script is idempotent — rerunning reports the current state (`pr_pending`,
+`not_registered`) instead of duplicating anything. Local folder is never touched.
+
+<details>
+<summary>Manual fallback (pre-v0.0.21 scaffolds)</summary>
+
 ```bash
 gh repo delete enochhz/$SLUG --yes && rm -rf ~/Claude_Projects/$SLUG
 ```
-Then remove the member entry from `agent-registry/members.yaml` — and, if you
-did the hosting step, its `deployments.yaml` entry too (the kill switch: the
-push tears the service + route down).
+Then ask the admin to remove the member entry from `agent-registry/members.yaml`
+(and `deployments.yaml` if hosted) — or run `copier update --trust` first to get
+the script.
+</details>
