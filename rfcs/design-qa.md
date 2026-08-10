@@ -71,3 +71,14 @@ No. They carry a different hidden marker (`fleet-ai-help` vs `fleet-ai-review`) 
 **Q: Mintlify or a docs platform?** Not yet — it's a landing page, not docs; self-contained beats hosted-elsewhere for the trust story. MkDocs Material / VitePress when real multi-page docs exist.
 
 **Q: Delete the bot's auto-filed failure issues?** Close with a root-cause comment, don't delete — they're the incident log the next failure gets pattern-matched against.
+
+## Can a merged deregistration PR resurrect old registry entries? (2026-08-09 incident)
+Yes — and it happened. A deregister PR branch (cut before an unrelated cleanup landed on main)
+was updated via GitHub's **Update branch** button; the conflict in deployments.yaml was resolved
+taking the stale side, which **resurrected four dead hosting entries and undid the deregistration
+itself**. The reconciler then faithfully re-created Railway services from *deleted* GitHub repos
+(serviceCreate succeeds even when the source repo is gone — you get a zombie service).
+Lessons: (1) after any conflicted registry merge, `grep slug: deployments.yaml` before trusting it;
+(2) the reconciler is intent-blind by design — garbage in, garbage deployed; a repo-existence
+check before serviceCreate would make zombies impossible. Repair = one commit restoring intent;
+the kill switch cleaned everything on the next run.
