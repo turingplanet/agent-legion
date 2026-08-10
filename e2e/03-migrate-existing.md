@@ -5,7 +5,10 @@ as an AI runbook, and the gate as the migration verifier.
 
 ## Steps
 
-1. Create a fake "existing project" with its own layout:
+1. Create a fake "existing project" with its own layout. (**Starting over?**
+The local `rm -rf` doesn't touch GitHub — delete the previous run's repo too:
+`gh repo delete enochhz/my-legacy-app --yes`, or step 6 fails with *"Name
+already exists"*.)
 ```bash
 cd ~/Claude_Projects && rm -rf my-legacy-app && mkdir -p my-legacy-app/src/services && cd my-legacy-app && git init && echo "# my-legacy-app" > README.md && printf '[project]\nname = "my-legacy-app"\nversion = "0.1.0"\ndependencies = ["fastapi"]\n' > pyproject.toml && printf 'def lookup_order(order_id: str) -> str:\n    return f"order {order_id}: shipped"\n' > src/services/orders.py && git add -A && git commit -m "existing code"
 ```
@@ -41,8 +44,11 @@ scripts/ — template ≥ v0.0.25); `README.md`, `pyproject.toml`, `src/` show *
 
 6. The gate is the definition of done:
 ```bash
-git checkout -b adopt-platform && git add -A && git commit -m "Adopt platform seam" && gh repo create enochhz/my-legacy-app --public --source . --push && git push -u origin adopt-platform && gh pr create --title "Adopt platform" --body "migration e2e" --head adopt-platform --base main
+git checkout -b adopt-platform && git add -A && git commit -m "Adopt platform seam" && gh repo create enochhz/my-legacy-app --public --source . --push && git push origin main && gh api -X PATCH repos/enochhz/my-legacy-app -f default_branch=main > /dev/null && gh pr create --title "Adopt platform" --body "migration e2e" --head adopt-platform --base main
 ```
+(`gh repo create --push` uploads only the branch you're on — the extra `git push
+origin main` publishes the base branch so the PR has something to diff against,
+and the PATCH makes `main` the default branch, where the platform reads consent.)
 → gate runs **your** manifest commands; green = migrated.
 
 
