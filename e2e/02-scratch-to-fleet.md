@@ -147,12 +147,12 @@ command is a future item). If you ARE the admin:
 cd /Users/haozheng/Claude_Projects/agent-军团/agent-registry && git pull -q && printf '  - slug: %s\n    repo: enochhz/%s\n    host: platform\n' "$SLUG" "$SLUG" >> deployments.yaml && git commit -qam "deploy: $SLUG" && git push
 ```
 
-~2–3 min later (the push IS the deploy trigger — service created, routed, TLS included):
+~2–3 min later (the push IS the deploy trigger — service created, routed, TLS included), verify from your agent repo — one command checks REST, does a real MCP handshake, and lists your tools (ships in the scaffold, template ≥ v0.0.22):
 
 ```bash
-curl https://$SLUG.agents.turingplanet.ai/api/health
+./scripts/test_platform_mcp.sh
 ```
-→ `{"ok":true,"agent":"<slug>"}` — and pushes to your repo's main now auto-redeploy.
+→ `✅ /api/health` · `✅ /mcp handshake OK` · `✅ tools/list → tool_say_hi, tool_run` + a ready-to-paste `claude mcp add` line. (Manual fallback: `curl https://$SLUG.agents.turingplanet.ai/api/health` → `{"ok":true,"agent":"<slug>"}`.) Pushes to your repo's main now auto-redeploy.
 
 Full walkthrough incl. the kill switch: [05-platform-hosting.md](05-platform-hosting.md).
 
