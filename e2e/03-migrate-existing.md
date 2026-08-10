@@ -7,7 +7,7 @@ as an AI runbook, and the gate as the migration verifier.
 
 1. Create a fake "existing project" with its own layout:
 ```bash
-cd ~/Claude_Projects && rm -rf my-legacy-app && mkdir -p my-legacy-app/src/services && cd my-legacy-app && git init && echo "# my-legacy-app" > README.md && printf '[project]\nname = "my-legacy-app"\ndependencies = ["fastapi"]\n' > pyproject.toml && printf 'def lookup_order(order_id: str) -> str:\n    return f"order {order_id}: shipped"\n' > src/services/orders.py && git add -A && git commit -m "existing code"
+cd ~/Claude_Projects && rm -rf my-legacy-app && mkdir -p my-legacy-app/src/services && cd my-legacy-app && git init && echo "# my-legacy-app" > README.md && printf '[project]\nname = "my-legacy-app"\nversion = "0.1.0"\ndependencies = ["fastapi"]\n' > pyproject.toml && printf 'def lookup_order(order_id: str) -> str:\n    return f"order {order_id}: shipped"\n' > src/services/orders.py && git add -A && git commit -m "existing code"
 ```
 
 2. Preflight (deterministic, nothing leaves your machine):
@@ -16,10 +16,15 @@ curl -fsSL https://raw.githubusercontent.com/turingplanet/agent-template/main/de
 ```
 → `language: python · MCP SDK present: no` → recommends **Scenario B**.
 
-3. Adopt — answer the manifest-command questions (defaults are fine here):
+3. Adopt — **the manifest-command questions are the whole point**: they must
+describe *this* repo, not the scratch kit. (The interactive defaults are the
+scratch kit's poetry/pytest/ruff commands — accepting them on a non-poetry
+repo gives you a red gate, by design: the gate runs exactly what you declare.)
+Non-interactive, with this fixture's real answers:
 ```bash
-copier copy --trust gh:turingplanet/agent-template . --data adopt_mode=true
+copier copy --trust gh:turingplanet/agent-template . --defaults --data adopt_mode=true --data toolchain_package_manager=pip --data cmd_install="pip install fastapi" --data cmd_test="python -m unittest discover -s src" --data cmd_lint="" --data cmd_security=""
 ```
+(Empty `lint`/`security` = those advisory steps are skipped until you add the tools.)
 
 4. **The promise check** — none of your files modified, only seam files added:
 ```bash
