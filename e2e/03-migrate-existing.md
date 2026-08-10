@@ -25,8 +25,8 @@ copier copy --trust gh:turingplanet/agent-template . --data adopt_mode=true
 ```bash
 git status --short
 ```
-→ only `??` additions (manifest, workflows, mcp_server/, config.py, railpack.json);
-`README.md`, `pyproject.toml`, `src/` show **no** `M` lines.
+→ only `??` additions (manifest, workflows, mcp_server/, config.py, railpack.json,
+scripts/ — template ≥ v0.0.25); `README.md`, `pyproject.toml`, `src/` show **no** `M` lines.
 
 5. Wire a tool — the intended way: open this repo in Claude Code and say
 *"Follow MIGRATE.md from github.com/turingplanet/agent-template — wire
@@ -46,10 +46,20 @@ git checkout -b adopt-platform && git add -A && git commit -m "Adopt platform se
 A migrated repo is a first-class member: registration (`/register` on any PR,
 or `fleet.register: true` + push), then `/review`, then optional platform
 hosting at `my-legacy-app.agents.turingplanet.ai` — identical to the scratch
-path from here on. Follow [02-scratch-to-fleet.md](02-scratch-to-fleet.md)
+path from here on, **including the scripts**: adoption ships
+`scripts/test_platform_mcp.sh` (verify your hosting + MCP handshake) and
+`scripts/teardown.sh` (leave the fleet), same as a scratch scaffold
+(template ≥ v0.0.25). Follow [02-scratch-to-fleet.md](02-scratch-to-fleet.md)
 steps 6–9 and its hosting section with `SLUG=my-legacy-app`.
 
 ## Teardown
+
+If you registered/hosted along the way, leave properly first (from the repo's
+**default branch** — the platform verifies consent there):
+```bash
+bash scripts/teardown.sh --delete-repo --yes
+```
+For the bare unregistered fixture, plain deletion is fine:
 ```bash
 gh repo delete enochhz/my-legacy-app --yes && rm -rf ~/Claude_Projects/my-legacy-app
 ```
