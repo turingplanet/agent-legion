@@ -13,7 +13,7 @@ If a word here ever feels like jargon, jump to the **[plain-language glossary](#
 | 👀 **Just curious** | try a live agent — install nothing | `claude mcp add --transport http legion-demo https://agent-demo.turingplanet.ai/mcp` | [agents.turingplanet.ai](https://agents.turingplanet.ai) |
 | 🆕 **Starting from scratch** | a working agent in minutes | `copier copy --trust gh:turingplanet/agent-template ./my-agent` | [agent-template quickstart](https://github.com/turingplanet/agent-template#readme) |
 | 📦 **Have an existing project** | adopt the platform *around* your code — nothing moved, rewritten, or deleted | `curl -fsSL https://raw.githubusercontent.com/turingplanet/agent-template/main/detect.sh \| bash` *(inside your repo)* | [MIGRATE.md](https://github.com/turingplanet/agent-template/blob/main/MIGRATE.md) — written to be handed to your AI |
-| 🚀 **Built it, want the perks** | fleet sync + free `/review` + hosting at `you.agents.turingplanet.ai` | install the App: [github.com/apps/turing-fleet-bot](https://github.com/apps/turing-fleet-bot), then comment `/register` on any PR | [Joining the fleet (§6)](#6-joining-the-fleet--the-whole-setup-in-two-lines) · [platform hosting](https://github.com/turingplanet/agent-registry#readme) |
+| 🚀 **Built it, want the perks** | fleet sync + free `/review` + hosting at `you.agents.turingplanet.ai` | install the App: [github.com/apps/fleet-migration-bot](https://github.com/apps/fleet-migration-bot), then comment `/register` on any PR | [Joining the fleet (§6)](#6-joining-the-fleet--the-whole-setup-in-two-lines) · [platform hosting](https://github.com/turingplanet/agent-registry#readme) |
 
 Each guide is the single source of truth for its path — the sections below explain *how the machine works* rather than *what to type*.
 
@@ -180,7 +180,7 @@ flowchart LR
 
 Scaffolding and running an agent needs **nothing from us** — the template and the review flow are public, and the gate runs in your own CI. Joining the *fleet* (so the platform can keep you in sync and offer you extras) is exactly two steps:
 
-1. **Install the platform's GitHub App** on your agent repo: **https://github.com/apps/turing-fleet-bot** — one click, and only the repo owner can do it (an App can't grant itself access).
+1. **Install the platform's GitHub App** on your agent repo: **https://github.com/apps/fleet-migration-bot** — one click, and only the repo owner can do it (an App can't grant itself access).
 2. **Get added to `members.yaml`** — a PR on [agent-registry](https://github.com/turingplanet/agent-registry) that a platform admin merges. The scaffold offers to open it for you.
 
 That's it. Step 1 is the *keys*, step 2 is the *roster* — you need both, and neither can substitute for the other. (If a sync ever fails with `Not Found`, it's always step 1.)
