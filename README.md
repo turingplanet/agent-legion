@@ -90,7 +90,7 @@ Only (3) pushes to your repo — and only as a PR you merge.
 
 ### The platform's own running services
 
-The four repos above are **files**. Two more are **services the platform runs** — you never install them, but they're public so you can read exactly what they do:
+The four repos above are **files**. Three more are **services the platform runs** — you never install them, but they're public so you can read exactly what they do:
 
 | repo | what it does | when it touches you |
 | --- | --- | --- |
@@ -98,7 +98,7 @@ The four repos above are **files**. Two more are **services the platform runs** 
 | [fleet-services](https://github.com/turingplanet/fleet-services) | holds the platform's credentials (LLM key, GitHub App) so member CI never has to: runs `/review` (§7), self-service registration (`/register` or push, §6), and teardown (`scripts/teardown.sh`) | only when you ask — a PR comment, a push with `fleet.register: true`, or the teardown script |
 | [fleet-gateway](https://github.com/turingplanet/fleet-gateway) | ONE MCP endpoint for the whole fleet: `claude mcp add --transport http fleet https://mcp.agents.turingplanet.ai/mcp` exposes every hosted agent's tools (`slug__tool`), routed over private networking | only if you connect to it — your agent is aggregated automatically while platform-hosted |
 
-Both follow the same rule as everything else: **they act with the platform's own credentials on the platform's own side**, and member repos only ever send public metadata (repo name, PR number). Nothing of yours is stored.
+All three follow the same rule as everything else: **they act with the platform's own credentials on the platform's own side**, and member repos only ever send public metadata (repo name, PR number). Nothing of yours is stored.
 
 ## 2. The two ways things connect: COPY vs REFERENCE
 
