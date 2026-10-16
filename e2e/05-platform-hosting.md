@@ -43,7 +43,7 @@ import os, pathlib
 s = os.environ['SLUG']; p = pathlib.Path('deployments.yaml')
 p.write_text(p.read_text().replace(f'''  - slug: {s}
     repo: enochhz/{s}
-    host: platform
+    host: railway
 ''', ''))" && git commit -qam "undeploy: $SLUG" && git push
 ```
 
