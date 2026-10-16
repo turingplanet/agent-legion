@@ -144,7 +144,7 @@ can merge it** (today the admin adds it directly; a self-service `/deploy`
 command is a future item). If you ARE the admin:
 
 ```bash
-cd /Users/haozheng/Claude_Projects/agent-军团/agent-registry && git pull -q && printf '  - slug: %s\n    repo: enochhz/%s\n    host: platform\n' "$SLUG" "$SLUG" >> deployments.yaml && git commit -qam "deploy: $SLUG" && git push
+cd /Users/haozheng/Claude_Projects/agent-军团/agent-registry && git pull -q && printf '  - slug: %s\n    repo: enochhz/%s\n    host: railway\n' "$SLUG" "$SLUG" >> deployments.yaml && python3 scripts/deploy-fleet.py --check && git commit -qam "deploy: $SLUG" && git push
 ```
 
 ~2–3 min later (the push IS the deploy trigger — service created, routed, TLS included), verify from your agent repo — one command checks REST, does a real MCP handshake, and lists your tools (ships in the scaffold, template ≥ v0.0.22):

@@ -8,7 +8,7 @@ member repo Railway's GitHub App can see — `enochhz/*` today).
 
 1. Add the entry — **the merge/push IS the deploy trigger**:
 ```bash
-cd /Users/haozheng/Claude_Projects/agent-军团/agent-registry && git pull -q && printf '  - slug: %s\n    repo: enochhz/%s\n    host: platform\n' "$SLUG" "$SLUG" >> deployments.yaml && git commit -qam "deploy: $SLUG" && git push
+cd /Users/haozheng/Claude_Projects/agent-军团/agent-registry && git pull -q && printf '  - slug: %s\n    repo: enochhz/%s\n    host: railway\n' "$SLUG" "$SLUG" >> deployments.yaml && python3 scripts/deploy-fleet.py --check && git commit -qam "deploy: $SLUG" && git push
 ```
 
 2. Watch the workflow (creates the Railway service + CD trigger, sets PORT/HOST,
